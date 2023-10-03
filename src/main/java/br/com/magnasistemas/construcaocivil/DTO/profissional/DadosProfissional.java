@@ -1,4 +1,4 @@
-package br.com.magnasistemas.construcaocivil.DTO.profissional;
+package br.com.magnasistemas.construcaocivil.dto.profissional;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

@@ -17,10 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.magnasistemas.construcaocivil.DTO.projeto.DadosAtualizarProjeto;
-import br.com.magnasistemas.construcaocivil.DTO.projeto.DadosDetalhamentoProjeto;
-import br.com.magnasistemas.construcaocivil.DTO.projeto.DadosProjeto;
-import br.com.magnasistemas.construcaocivil.entity.Projeto;
+import br.com.magnasistemas.construcaocivil.dto.projeto.DadosAtualizarProjeto;
+import br.com.magnasistemas.construcaocivil.dto.projeto.DadosDetalhamentoProjeto;
+import br.com.magnasistemas.construcaocivil.dto.projeto.DadosProjeto;
 import br.com.magnasistemas.construcaocivil.service.ProjetoService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid; 
@@ -34,9 +33,8 @@ public class ProjetoController {
 	
 		@PostMapping ("cadastrar")
 		@Transactional
-		public ResponseEntity<Projeto> cadastrar (@RequestBody @Valid DadosProjeto dados) {
-			service.criarProjeto(dados);
-			return ResponseEntity.status(HttpStatus.CREATED).build();
+		public ResponseEntity<Optional<DadosDetalhamentoProjeto>> cadastrar (@RequestBody @Valid DadosProjeto dados) {
+			return ResponseEntity.status(HttpStatus.CREATED).body(service.criarProjeto(dados));
 		}
 		
 		@GetMapping ("/buscar/{id}")
@@ -58,9 +56,9 @@ public class ProjetoController {
 		
 		@DeleteMapping ("deletar/{id}")
 		@Transactional
-		public ResponseEntity<Projeto> deletar(@PathVariable Long id){
+		public ResponseEntity<HttpStatus> deletar(@PathVariable Long id){
 			service.deletar(id);
-			return ResponseEntity.noContent().build();
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 		}
 		
 

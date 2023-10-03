@@ -17,16 +17,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.magnasistemas.construcaocivil.DTO.equipe.DadosAtualizarEquipe;
-import br.com.magnasistemas.construcaocivil.DTO.equipe.DadosDetalhamentoEquipe;
-import br.com.magnasistemas.construcaocivil.DTO.equipe.DadosEquipe;
-import br.com.magnasistemas.construcaocivil.DTO.profissional.DadosAtualizarProfissional;
-import br.com.magnasistemas.construcaocivil.DTO.profissional.DadosDetalhamentoProfissional;
-import br.com.magnasistemas.construcaocivil.DTO.profissional.DadosProfissional;
-import br.com.magnasistemas.construcaocivil.entity.Equipe;
-import br.com.magnasistemas.construcaocivil.entity.Profissional;
+import br.com.magnasistemas.construcaocivil.dto.equipe.DadosAtualizarEquipe;
+import br.com.magnasistemas.construcaocivil.dto.equipe.DadosDetalhamentoEquipe;
+import br.com.magnasistemas.construcaocivil.dto.equipe.DadosEquipe;
 import br.com.magnasistemas.construcaocivil.service.EquipeService;
-import br.com.magnasistemas.construcaocivil.service.ProfissionalService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
@@ -38,11 +32,10 @@ public class EquipeController {
 	private EquipeService service;
 	
 	
-	@PostMapping
+	@PostMapping ("/cadastrar")
 	@Transactional
-	public ResponseEntity<Profissional> cadastrar (@RequestBody @Valid DadosEquipe dados) {
-		service.criarEquipe(dados);	
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+	public ResponseEntity<Optional<DadosDetalhamentoEquipe>> cadastrar (@RequestBody @Valid DadosEquipe dados) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(service.criarEquipe(dados));
 	}
  
 	@GetMapping ("/buscar/{id}")
@@ -50,35 +43,41 @@ public class EquipeController {
 		return ResponseEntity.ok(service.buscarPorId(id));
 	}
 	
-	@GetMapping ("listar")
+	@GetMapping ("/listar")
 	public ResponseEntity<Page<DadosDetalhamentoEquipe>> listar (
 			@PageableDefault(size = 10, sort = {"nome"}) Pageable paginacao) {
 		return ResponseEntity.ok(service.listar(paginacao));
 	}
 	
-	@GetMapping ("listar/todos")
+	@GetMapping ("/listar/todos")
 	public ResponseEntity<Page<DadosDetalhamentoEquipe>> listarTodos (
 			@PageableDefault(size = 10, sort = {"nome"}) Pageable paginacao) {
 		return ResponseEntity.ok(service.listarTodos(paginacao)); 
 	}
 	
-	@PutMapping ("atualizar")
+	@PutMapping ("/atualizar")
 	@Transactional
 	public ResponseEntity<DadosDetalhamentoEquipe> atualizar(@RequestBody @Valid DadosAtualizarEquipe dados){
 		return ResponseEntity.ok(service.atualizar(dados));
 	}
 	 
-	@DeleteMapping ("desativar/{id}")
+	@PutMapping ("/ativar/{id}")
+	@Transactional
+	public ResponseEntity<DadosDetalhamentoEquipe> ativar(@PathVariable Long id){
+		return ResponseEntity.ok(service.ativar(id)) ;
+	}
+	
+	@DeleteMapping ("/desativar/{id}")
 	@Transactional
 	public ResponseEntity<DadosDetalhamentoEquipe> desativar(@PathVariable Long id){
 		return ResponseEntity.ok(service.desativar(id));
 	}
 	
-	@DeleteMapping ("deletar/{id}")
+	@DeleteMapping ("/deletar/{id}")
 	@Transactional
-	public ResponseEntity<Equipe> deletar(@PathVariable Long id){
-		service.deletar(id);
-		return ResponseEntity.noContent().build();
+	public ResponseEntity<HttpStatus> deletar(@PathVariable Long id){
+		service.deletar(id); 
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
 

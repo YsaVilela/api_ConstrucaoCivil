@@ -1,0 +1,27 @@
+package br.com.magnasistemas.construcaocivil.service.validacoes.cargo;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import br.com.magnasistemas.construcaocivil.entity.Cargo;
+import br.com.magnasistemas.construcaocivil.exception.BuscarException;
+import br.com.magnasistemas.construcaocivil.repository.CargoRepository;
+
+@Component
+public class ExisteCargo implements ValidadorCargo{
+	
+	@Autowired
+	private CargoRepository cargoRepository;
+	
+	@Override
+	public void validar(Long id) {
+		Optional<Cargo> validarCargo = cargoRepository.findById(id);
+		if (validarCargo.isEmpty()) 
+			throw new BuscarException ("Cargo não encontrado");		
+	}
+	
+	
+
+}

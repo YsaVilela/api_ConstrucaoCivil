@@ -1,4 +1,4 @@
-package br.com.magnasistemas.construcaocivil.DTO.construtora;
+package br.com.magnasistemas.construcaocivil.dto.construtora;
 
 import br.com.magnasistemas.construcaocivil.entity.Construtora;
 

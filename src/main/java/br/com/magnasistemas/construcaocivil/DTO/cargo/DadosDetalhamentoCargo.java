@@ -1,4 +1,4 @@
-package br.com.magnasistemas.construcaocivil.DTO.cargo;
+package br.com.magnasistemas.construcaocivil.dto.cargo;
 
 import br.com.magnasistemas.construcaocivil.entity.Cargo;
 

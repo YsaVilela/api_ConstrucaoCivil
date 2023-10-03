@@ -1,4 +1,4 @@
-package br.com.magnasistemas.construcaocivil.DTO.construtora;
+package br.com.magnasistemas.construcaocivil.dto.construtora;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

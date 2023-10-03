@@ -20,12 +20,16 @@ public class Cargo {
 	@Id  @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id") 
 	private Long id;
+	
+	@Column(name = "nome", unique = true) 
 	private String nome;
+	
+	@Column(name = "remuneracao") 
 	private Double remuneracao;
 	
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "cargo")
     @JsonIgnore
-    private List<Profissional> cargo = new ArrayList<>();
+    private List<Profissional> profissionais = new ArrayList<>();
 
 	
 	public String getNome() {

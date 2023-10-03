@@ -37,7 +37,7 @@ import jakarta.persistence.Table;
 		
 		@OneToMany(cascade = CascadeType.ALL, mappedBy = "construtora")
 	    @JsonIgnore
-	    private List<Projeto> construtora = new ArrayList<>();
+	    private List<Projeto> projetos = new ArrayList<>();
 		
 		
 		public long getId() {

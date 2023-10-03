@@ -1,5 +1,6 @@
 package br.com.magnasistemas.construcaocivil.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,15 +8,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import br.com.magnasistemas.construcaocivil.DTO.equipe.DadosAtualizarEquipe;
-import br.com.magnasistemas.construcaocivil.DTO.equipe.DadosDetalhamentoEquipe;
-import br.com.magnasistemas.construcaocivil.DTO.equipe.DadosEquipe;
-import br.com.magnasistemas.construcaocivil.entity.Construtora;
+import br.com.magnasistemas.construcaocivil.dto.equipe.DadosAtualizarEquipe;
+import br.com.magnasistemas.construcaocivil.dto.equipe.DadosDetalhamentoEquipe;
+import br.com.magnasistemas.construcaocivil.dto.equipe.DadosEquipe;
 import br.com.magnasistemas.construcaocivil.entity.Equipe;
 import br.com.magnasistemas.construcaocivil.exception.BuscarException;
-import br.com.magnasistemas.construcaocivil.exception.EntidadeDesativada;
 import br.com.magnasistemas.construcaocivil.repository.ConstrutoraRepository;
 import br.com.magnasistemas.construcaocivil.repository.EquipeRepository;
+import br.com.magnasistemas.construcaocivil.repository.ProfissionalEquipeRepository;
+import br.com.magnasistemas.construcaocivil.service.validacoes.construtora.ValidadorConstrutora;
+import br.com.magnasistemas.construcaocivil.service.validacoes.equipe.ValidadorEquipe;
 import jakarta.validation.Valid;
 
 @Service
@@ -26,33 +28,39 @@ public class EquipeService {
 	@Autowired
 	private ConstrutoraRepository construtoraRepository;
 	
-	public void criarEquipe(DadosEquipe dados) {
+	@Autowired
+	private ProfissionalEquipeRepository profissionalEquipeRepository;
+	
+	@Autowired
+	private List<ValidadorConstrutora> validadoresConstrutora;
+	
+	@Autowired
+	private List<ValidadorEquipe> validadoresEquipe;
+	
+	
+	public Optional<DadosDetalhamentoEquipe> criarEquipe(DadosEquipe dados) {
+
+		validadoresConstrutora.forEach(v -> v.validar(dados.idConstrutora()));
+		
 		Equipe equipe = new Equipe();
-		
-		Optional<Construtora> validarConstrutora = construtoraRepository.findById(dados.idConstrutora());
-		if (validarConstrutora.isEmpty()) 
-			throw new BuscarException ("Construtora não encontrada");
-		Construtora construtora = construtoraRepository.getReferenceById(dados.idConstrutora());
-		if (!construtora.isStatus())
-			throw new EntidadeDesativada ("Construtora desativada");
-				
-		
-		equipe.setConstrutora(construtora);
+		equipe.setConstrutora(construtoraRepository.getReferenceById(dados.idConstrutora()));
 		equipe.setNome(dados.nome());
 		equipe.setTurno(dados.turno());
 		equipe.setStatus(true);
 		
 		equipeRepository.save(equipe);
+		
+		return equipeRepository.findById(equipe.getId()).map(DadosDetalhamentoEquipe::new);
 	}
 
 	public Optional<DadosDetalhamentoEquipe> buscarPorId(Long id) {
-		Optional<Equipe> validarProfissional = equipeRepository.findById(id);
-		if (validarProfissional.isEmpty()) 
-			throw new BuscarException ("Equipe não encontrado");
 		
+		validadoresEquipe.forEach(v -> v.validar(id));
+
         return equipeRepository.findById(id).map(DadosDetalhamentoEquipe::new); 
 	}
 
+	
 	public Page<DadosDetalhamentoEquipe> listar(Pageable paginacao) {
         return equipeRepository.findAllByStatusTrue(paginacao).map(DadosDetalhamentoEquipe::new);
 	} 
@@ -62,29 +70,32 @@ public class EquipeService {
 	}
 
 	public DadosDetalhamentoEquipe atualizar(@Valid DadosAtualizarEquipe dados) {
-		Optional<Equipe> validarEquipe = equipeRepository.findById(dados.id());
-		if (validarEquipe.isEmpty()) 
-			throw new BuscarException ("Equipe não encontrado");
 		
-		Optional<Construtora> validarConstrutora = construtoraRepository.findById(dados.idConstrutora());
-		if (validarConstrutora.isEmpty()) 
-			throw new BuscarException ("Construtora não encontrada");
-		Construtora construtora = construtoraRepository.getReferenceById(dados.idConstrutora());
-		if (!construtora.isStatus())
-			throw new EntidadeDesativada ("Construtora desativada");
+		validadoresEquipe.forEach(v -> v.validar(dados.id()));
+		validadoresConstrutora.forEach(v -> v.validar(dados.idConstrutora()));
 		
 		Equipe equipe = equipeRepository.getReferenceById(dados.id());
-			equipe.setConstrutora(construtora);
+			equipe.setConstrutora(construtoraRepository.getReferenceById(dados.id()));
 			equipe.setNome(dados.nome());
 			equipe.setTurno(dados.turno());
 			equipeRepository.save(equipe);
 		return new DadosDetalhamentoEquipe(equipe);
 	}
-
-	public DadosDetalhamentoEquipe desativar(Long id) {
+	
+	public DadosDetalhamentoEquipe ativar(Long id) {
 		Optional<Equipe> validarEquipe = equipeRepository.findById(id);
 		if (validarEquipe.isEmpty()) 
 			throw new BuscarException ("Equipe não encontrado");
+		
+		Equipe equipe = equipeRepository.getReferenceById(id);
+			equipe.setStatus(true);
+			equipeRepository.save(equipe);
+		return new DadosDetalhamentoEquipe(equipe);
+	}
+
+	
+	public DadosDetalhamentoEquipe desativar(Long id) {
+		validadoresEquipe.forEach(v -> v.validar(id));
 		
 		Equipe equipe = equipeRepository.getReferenceById(id);
 			equipe.setStatus(false);
@@ -94,6 +105,7 @@ public class EquipeService {
 
 	public void deletar(Long id) {
 		equipeRepository.deleteById(id);
+		profissionalEquipeRepository.deleteByIdEquipe(id);
 	}
  
 

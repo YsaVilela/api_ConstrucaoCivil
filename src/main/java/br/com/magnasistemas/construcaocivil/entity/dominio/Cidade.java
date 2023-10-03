@@ -6,7 +6,6 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import br.com.magnasistemas.construcaocivil.entity.Endereco;
-import br.com.magnasistemas.construcaocivil.entity.Projeto;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,22 +29,34 @@ public class Cidade {
 	
 	@ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "fk_estado")
-	private Estados fk_estado;
+	private Estados estado;
 	
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "cidade")
     @JsonIgnore
-    private List<Endereco> construtora = new ArrayList<>();
+    private List<Endereco> endereco = new ArrayList<>();
 
 	public Long getId() {
 		return id;
 	}
 
 	public Estados getEstado() {
-		return fk_estado;
+		return estado;
 	}
 
 	public String getNome() {
 		return nome;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+
+	public void setEstado(Estados estado) {
+		this.estado = estado;
 	}
 	
 	

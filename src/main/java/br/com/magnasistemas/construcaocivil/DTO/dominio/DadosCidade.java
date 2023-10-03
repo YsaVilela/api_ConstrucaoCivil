@@ -1,4 +1,4 @@
-package br.com.magnasistemas.construcaocivil.DTO.dominio;
+package br.com.magnasistemas.construcaocivil.dto.dominio;
 
 import br.com.magnasistemas.construcaocivil.entity.dominio.Cidade;
 import br.com.magnasistemas.construcaocivil.entity.dominio.Estados;

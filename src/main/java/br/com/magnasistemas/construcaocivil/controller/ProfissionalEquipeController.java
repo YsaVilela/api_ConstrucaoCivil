@@ -1,5 +1,6 @@
 package br.com.magnasistemas.construcaocivil.controller;
 
+
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,15 +13,12 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
-import br.com.magnasistemas.construcaocivil.DTO.profissionalEquipe.DadosDetalhamentoProfissionalEquipe;
-import br.com.magnasistemas.construcaocivil.DTO.profissionalEquipe.DadosProfissionalEquipe;
-import br.com.magnasistemas.construcaocivil.entity.Projeto;
+import br.com.magnasistemas.construcaocivil.dto.profissional_equipe.DadosDetalhamentoProfissionalEquipe;
+import br.com.magnasistemas.construcaocivil.dto.profissional_equipe.DadosProfissionalEquipe;
 import br.com.magnasistemas.construcaocivil.service.ProfissionalEquipeService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -34,42 +32,36 @@ public class ProfissionalEquipeController {
 	
 		@PostMapping ("cadastrar")
 		@Transactional
-		public ResponseEntity<Projeto> cadastrar (@RequestBody @Valid DadosProfissionalEquipe dados) {
-			service.criarProfissioanlEquipe(dados);
-			return ResponseEntity.status(HttpStatus.CREATED).build();
-		}
+		public ResponseEntity<Optional<DadosDetalhamentoProfissionalEquipe>> cadastrar (@RequestBody @Valid DadosProfissionalEquipe dados) {
+			return ResponseEntity.status(HttpStatus.CREATED).body(service.criarProfissioanlEquipe(dados));
+		}  
 		
 		@GetMapping ("/buscarEquipe/{id}")
 		public ResponseEntity<Page<DadosDetalhamentoProfissionalEquipe>> buscarEquipe (
-				@PageableDefault(size = 10, sort = {"nome"}) Pageable paginacao,
+				@PageableDefault(size = 10, sort = {"id"}) Pageable paginacao,
 				@PathVariable Long id) {
-			return ResponseEntity.ok(service.listarEquipe(paginacao,id));
+			return ResponseEntity.ok(service.listarEquipe(id,paginacao));
 		}
 		
 		@GetMapping ("/buscarProfissional/{id}")
 		public ResponseEntity<Page<DadosDetalhamentoProfissionalEquipe>> buscarProfissional (
-				@PathVariable Long id, @PageableDefault(size = 10, sort = {"nome"}) Pageable paginacao) {
-			return ResponseEntity.ok(service.listarProfissional(paginacao, id));
+				@PathVariable Long id, @PageableDefault(size = 10, sort = {"id"}) Pageable paginacao) {
+			return ResponseEntity.ok(service.listarProfissional(id,paginacao));
 		}
 		 
-//		@GetMapping ("listar")
-//		public ResponseEntity<Page<DadosDetalhamentoCargo>> listar (
-//				@PageableDefault(size = 10, sort = {"nome"}) Pageable paginacao) {
-//			return ResponseEntity.ok(service.listar(paginacao));
-//		}
-//		
-//		@PutMapping ("atualizar")
-//		@Transactional
-//		public ResponseEntity<DadosDetalhamentoCargo> atualizar(@RequestBody @Valid DadosAtualizarCargo dados){
-//			return ResponseEntity.ok(service.atualizar(dados)) ;
-//		}
-//		
-//		@DeleteMapping ("deletar/{id}")
-//		@Transactional
-//		public ResponseEntity<Cargo> deletar(@PathVariable Long id){
-//			service.deletar(id);
-//			return ResponseEntity.noContent().build();
-//		}
+		@GetMapping ("listar")
+		public ResponseEntity<Page<DadosDetalhamentoProfissionalEquipe>> listar (
+				@PageableDefault(size = 10, sort = {"id"}) Pageable paginacao) {
+			return ResponseEntity.ok(service.listar(paginacao));
+		}
+		
+	 
+		@DeleteMapping ("deletar/{id}")
+		@Transactional
+		public ResponseEntity<HttpStatus> deletar(@PathVariable Long id){
+			service.deletar(id);
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+		}
 
 	
 	

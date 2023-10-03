@@ -1,5 +1,6 @@
 package br.com.magnasistemas.construcaocivil.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,19 +8,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import br.com.magnasistemas.construcaocivil.DTO.projeto.DadosAtualizarProjeto;
-import br.com.magnasistemas.construcaocivil.DTO.projeto.DadosDetalhamentoProjeto;
-import br.com.magnasistemas.construcaocivil.DTO.projeto.DadosProjeto;
-import br.com.magnasistemas.construcaocivil.entity.Construtora;
+import br.com.magnasistemas.construcaocivil.dto.projeto.DadosAtualizarProjeto;
+import br.com.magnasistemas.construcaocivil.dto.projeto.DadosDetalhamentoProjeto;
+import br.com.magnasistemas.construcaocivil.dto.projeto.DadosProjeto;
 import br.com.magnasistemas.construcaocivil.entity.Endereco;
 import br.com.magnasistemas.construcaocivil.entity.Projeto;
 import br.com.magnasistemas.construcaocivil.entity.dominio.Cidade;
 import br.com.magnasistemas.construcaocivil.exception.BuscarException;
-import br.com.magnasistemas.construcaocivil.exception.EntidadeDesativada;
 import br.com.magnasistemas.construcaocivil.repository.ConstrutoraRepository;
 import br.com.magnasistemas.construcaocivil.repository.ProjetoRepository;
 import br.com.magnasistemas.construcaocivil.repository.EnderecoRepository;
 import br.com.magnasistemas.construcaocivil.repository.dominio.CidadesRepository;
+import br.com.magnasistemas.construcaocivil.service.validacoes.construtora.ValidadorConstrutora;
 import jakarta.validation.Valid;
 
 @Service
@@ -37,20 +37,19 @@ public class ProjetoService {
 	@Autowired
 	private CidadesRepository cidadeRepository;
 	
+	@Autowired
+	private List<ValidadorConstrutora> validadoresConstrutora;
 	
-	public void criarProjeto (@Valid DadosProjeto dados) {
+	
+	public Optional<DadosDetalhamentoProjeto> criarProjeto (@Valid DadosProjeto dados) {
 		
-		Optional<Construtora> validarConstrutora = construtoraRepository.findById(dados.idConstrutora());
-		if (validarConstrutora.isEmpty()) 
-			throw new BuscarException ("Construtora não encontrada");
-		Construtora construtora = construtoraRepository.getReferenceById(dados.idConstrutora());
-		if (!construtora.isStatus())
-			throw new EntidadeDesativada ("Construtora desativada");
+		validadoresConstrutora.forEach(v -> v.validar(dados.idConstrutora()));
 
 		Projeto projeto = new Projeto();
 		projeto.setNome(dados.nome());
 		projeto.setOrcamentoMaximo(dados.orcamentoMaximo());
 		projeto.setDescricao(dados.descricao());
+		projeto.setConstrutora(construtoraRepository.getReferenceById(dados.idConstrutora()));
 		
 		projetoRepository.save(projeto);
 		
@@ -68,6 +67,8 @@ public class ProjetoService {
 		endereco.setProjeto(projetoRepository.getReferenceById(projeto.getId()));
 		
 		enderecoRepository.save(endereco);
+		 
+		return projetoRepository.findById(projeto.getId()).map(DadosDetalhamentoProjeto::new); 
 	} 
 
 	public Optional<DadosDetalhamentoProjeto> buscarPorId(Long id) {

@@ -1,4 +1,4 @@
-package br.com.magnasistemas.construcaocivil.DTO.construtora;
+package br.com.magnasistemas.construcaocivil.dto.construtora;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Pattern;
 
 public record DadosConstrutora(
 		@NotBlank (message = "CNPJ é obrigatório")
-		@Pattern(regexp = "\\d{11}", message = "CNPJ inválido")
+		@Pattern(regexp = "\\d{14}", message = "CNPJ inválido")
 		String cnpj,
 		
 		@NotBlank (message = "Nome é obrigatório")
@@ -19,4 +19,8 @@ public record DadosConstrutora(
 		
 		@Email (message = "Email inválido")
 		String email) {
+
+		
+
+			
 }

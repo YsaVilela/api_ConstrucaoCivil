@@ -20,9 +20,16 @@ public class Endereco {
 	@Column(name = "id") 
 	private Long id;
 	
+	@Column(name = "cep") 
 	private String cep;
+	
+	@Column(name = "logradouro") 
 	private String logradouro;
+	
+	@Column(name = "numero") 
 	private Long numero;
+	
+	@Column(name = "complemento") 
 	private String complemento;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
@@ -30,7 +37,7 @@ public class Endereco {
     private Cidade cidade;
 	
 	@OneToOne(cascade = { CascadeType.ALL })
-	@JoinColumn(name = "fk_projeto")
+	@JoinColumn(name = "fk_projeto", unique = true)
 	private Projeto projeto;
 
 	

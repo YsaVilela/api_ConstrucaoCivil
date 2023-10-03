@@ -25,19 +25,24 @@ public class Equipe {
 	@Id  @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id") 
 	private Long id;
+	
+	@Column(name = "nome")
 	private String nome;
 	
 	@Enumerated(EnumType.STRING)
+	@Column(name = "turno")
 	private Turno turno;
+	
+	@Column(name = "status")
 	private boolean status;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "fk_construtora")
-    private Construtora construtora;
+    protected Construtora construtora;
     
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "equipe")
     @JsonIgnore
-    private List<ProfissionalEquipe> equipe = new ArrayList<>();
+    private List<ProfissionalEquipe> profissionalEquipe = new ArrayList<>();
 
     
 	public String getNome() {

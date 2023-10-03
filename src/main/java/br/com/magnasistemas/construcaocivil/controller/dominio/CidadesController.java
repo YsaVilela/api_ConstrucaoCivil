@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.magnasistemas.construcaocivil.DTO.dominio.DadosCidade;
+import br.com.magnasistemas.construcaocivil.dto.dominio.DadosCidade;
 import br.com.magnasistemas.construcaocivil.repository.dominio.CidadesRepository;
 
 @RestController
@@ -22,9 +22,8 @@ public class CidadesController {
 	@GetMapping
 	public ResponseEntity<Page<DadosCidade>> listar (
 			@PageableDefault(size = 10, sort = {"id"}) Pageable paginacao) {
-		var ListagemDeCidades = repository.findAll(paginacao).map(DadosCidade::new);
-		return ResponseEntity.ok(ListagemDeCidades);
-		
-	}
+		Page<DadosCidade> listagemDeCidades = repository.findAll(paginacao).map(DadosCidade::new);
+		return ResponseEntity.ok(listagemDeCidades);
+	} 
  
 }

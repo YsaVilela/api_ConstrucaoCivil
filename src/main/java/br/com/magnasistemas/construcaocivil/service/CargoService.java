@@ -7,9 +7,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import br.com.magnasistemas.construcaocivil.DTO.cargo.DadosAtualizarCargo;
-import br.com.magnasistemas.construcaocivil.DTO.cargo.DadosCargo;
-import br.com.magnasistemas.construcaocivil.DTO.cargo.DadosDetalhamentoCargo;
+import br.com.magnasistemas.construcaocivil.dto.cargo.DadosAtualizarCargo;
+import br.com.magnasistemas.construcaocivil.dto.cargo.DadosCargo;
+import br.com.magnasistemas.construcaocivil.dto.cargo.DadosDetalhamentoCargo;
 import br.com.magnasistemas.construcaocivil.entity.Cargo;
 import br.com.magnasistemas.construcaocivil.exception.BuscarException;
 import br.com.magnasistemas.construcaocivil.repository.CargoRepository;
@@ -21,11 +21,13 @@ public class CargoService {
 	@Autowired
 	private CargoRepository cargoRepository;
 	
-	public void criarCargo(DadosCargo dados) {
+	public Optional<DadosDetalhamentoCargo> criarCargo(DadosCargo dados) {
 		Cargo cargo = new Cargo();
 		cargo.setNome(dados.nome());
 		cargo.setRemuneracao(dados.remuneracao());
 		cargoRepository.save(cargo);
+		 
+		return cargoRepository.findById(cargo.getId()).map(DadosDetalhamentoCargo::new);
 	}
 	
 	public Optional<DadosDetalhamentoCargo> buscarPorId(Long id) {

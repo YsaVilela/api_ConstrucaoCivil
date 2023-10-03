@@ -1,5 +1,6 @@
 package br.com.magnasistemas.construcaocivil.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,12 +8,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import br.com.magnasistemas.construcaocivil.DTO.construtora.DadosAtualizarConstrutora;
-import br.com.magnasistemas.construcaocivil.DTO.construtora.DadosConstrutora;
-import br.com.magnasistemas.construcaocivil.DTO.construtora.DadosDetalhamentoConstrutora;
+import br.com.magnasistemas.construcaocivil.dto.construtora.DadosAtualizarConstrutora;
+import br.com.magnasistemas.construcaocivil.dto.construtora.DadosConstrutora;
+import br.com.magnasistemas.construcaocivil.dto.construtora.DadosDetalhamentoConstrutora;
 import br.com.magnasistemas.construcaocivil.entity.Construtora;
 import br.com.magnasistemas.construcaocivil.exception.BuscarException;
 import br.com.magnasistemas.construcaocivil.repository.ConstrutoraRepository;
+import br.com.magnasistemas.construcaocivil.service.validacoes.construtora.ValidadorConstrutora;
 import jakarta.validation.Valid;
 
 @Service
@@ -21,7 +23,11 @@ public class ConstrutoraService {
 	@Autowired
 	private ConstrutoraRepository construtoraRepository;
 	
-	public void criarConstrutora(DadosConstrutora dados) {
+	@Autowired
+	private List<ValidadorConstrutora> validadoresConstrutora;
+
+	
+	public Optional<DadosDetalhamentoConstrutora> criarConstrutora(DadosConstrutora dados) {
 		Construtora construtora = new Construtora();
 		construtora.setCnpj(dados.cnpj());
 		construtora.setNome(dados.nome());
@@ -29,13 +35,12 @@ public class ConstrutoraService {
 		construtora.setEmail(dados.email());
 		construtora.setStatus(true);
 		construtoraRepository.save(construtora);
+		
+		return construtoraRepository.findById(construtora.getId()).map(DadosDetalhamentoConstrutora::new);
 	}
 
 	public Optional<DadosDetalhamentoConstrutora> buscarPorId(Long id) {
-		Optional<Construtora> validarConstrutora = construtoraRepository.findById(id);
-		if (validarConstrutora.isEmpty()) 
-			throw new BuscarException ("Construtora não encontrada");
-		
+		validadoresConstrutora.forEach(v -> v.validar(id));
         return construtoraRepository.findById(id).map(DadosDetalhamentoConstrutora::new); 
 	}
 
@@ -48,23 +53,30 @@ public class ConstrutoraService {
 	}
 
 	public DadosDetalhamentoConstrutora atualizar(@Valid DadosAtualizarConstrutora dados) {
-		Optional<Construtora> validarConstrutora = construtoraRepository.findById(dados.id());
-		if (validarConstrutora.isEmpty()) 
-			throw new BuscarException ("Construtora não encontrada");
+		validadoresConstrutora.forEach(v -> v.validar(dados.id()));
 		
 		Construtora construtora = construtoraRepository.getReferenceById(dados.id());
-				construtora.setNome(dados.nome());
+				construtora.setNome(dados.nome()); 
 				construtora.setTelefone(dados.telefone());
 				construtora.setEmail(dados.email());
 		construtoraRepository.save(construtora);
 		return new DadosDetalhamentoConstrutora(construtora);
 	}
-
-	public DadosDetalhamentoConstrutora desativar(Long id) {
+	
+	public DadosDetalhamentoConstrutora ativar(Long id) {
 		Optional<Construtora> validarConstrutora = construtoraRepository.findById(id);
 		if (validarConstrutora.isEmpty()) 
 			throw new BuscarException ("Construtora não encontrada");
 		
+		Construtora construtora = construtoraRepository.getReferenceById(id);
+			construtora.setStatus(true);
+		construtoraRepository.save(construtora);
+		return new DadosDetalhamentoConstrutora(construtora);
+	}
+
+	public DadosDetalhamentoConstrutora desativar(Long id) {
+		validadoresConstrutora.forEach(v -> v.validar(id));
+
 		Construtora construtora = construtoraRepository.getReferenceById(id);
 			construtora.setStatus(false);
 		construtoraRepository.save(construtora);
@@ -72,8 +84,9 @@ public class ConstrutoraService {
 	}
 
 	public void deletar(Long id) {
-		construtoraRepository.deleteById(id);
+		construtoraRepository.deleteById(id);		
 	}
+
  
 } 
 	 

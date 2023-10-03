@@ -17,10 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.magnasistemas.construcaocivil.DTO.profissional.DadosAtualizarProfissional;
-import br.com.magnasistemas.construcaocivil.DTO.profissional.DadosDetalhamentoProfissional;
-import br.com.magnasistemas.construcaocivil.DTO.profissional.DadosProfissional;
-import br.com.magnasistemas.construcaocivil.entity.Profissional;
+import br.com.magnasistemas.construcaocivil.dto.profissional.DadosAtualizarProfissional;
+import br.com.magnasistemas.construcaocivil.dto.profissional.DadosDetalhamentoProfissional;
+import br.com.magnasistemas.construcaocivil.dto.profissional.DadosProfissional;
 import br.com.magnasistemas.construcaocivil.service.ProfissionalService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -33,12 +32,11 @@ public class ProfissionalController {
 	private ProfissionalService service;
 	
 	
-	@PostMapping
+	@PostMapping ("cadastrar")
 	@Transactional
-	public ResponseEntity<Profissional> cadastrar (@RequestBody @Valid DadosProfissional dados) {
-		service.criarProfissional(dados);	
-		return ResponseEntity.status(HttpStatus.CREATED).build();
-	}
+	public ResponseEntity<Optional<DadosDetalhamentoProfissional>> cadastrar (@RequestBody @Valid DadosProfissional dados) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(service.criarProfissional(dados));
+	}  
  
 	@GetMapping ("/buscar/{id}")
 	public ResponseEntity<Optional<DadosDetalhamentoProfissional>> buscar (@PathVariable Long id) {
@@ -62,6 +60,12 @@ public class ProfissionalController {
 	public ResponseEntity<DadosDetalhamentoProfissional> atualizar(@RequestBody @Valid DadosAtualizarProfissional dados){
 		return ResponseEntity.ok(service.atualizar(dados)) ;
 	}
+	
+	@PutMapping ("ativar/{id}")
+	@Transactional
+	public ResponseEntity<DadosDetalhamentoProfissional> ativar(@PathVariable Long id){
+		return ResponseEntity.ok(service.ativar(id));
+	}
 	 
 	@DeleteMapping ("desativar/{id}")
 	@Transactional
@@ -71,9 +75,9 @@ public class ProfissionalController {
 	
 	@DeleteMapping ("deletar/{id}")
 	@Transactional
-	public ResponseEntity<Profissional> deletar(@PathVariable Long id){
+	public ResponseEntity<HttpStatus> deletar(@PathVariable Long id){
 		service.deletar(id);
-		return ResponseEntity.noContent().build();
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
 

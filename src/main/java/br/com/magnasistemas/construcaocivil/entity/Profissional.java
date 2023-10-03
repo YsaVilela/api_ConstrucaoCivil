@@ -22,22 +22,30 @@ public class Profissional {
 	@Id  @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id") 
 	private Long id;
+	
+	@Column(name = "cpf", unique = true) 
 	private String cpf;
+	
+	@Column(name = "nome") 
 	private String nome;
+	
+	@Column(name = "telefone", unique = true) 
 	private String telefone;
+	
+	@Column(name = "status") 
 	private boolean status;
 	
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "fk_construtora")
-    private Construtora construtora;
+    protected Construtora construtora;
     
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "fk_cargo")
-    private Cargo cargo;
+    protected Cargo cargo;
     
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "profissional")
     @JsonIgnore
-    private List<ProfissionalEquipe> profissional = new ArrayList<>();
+    private List<ProfissionalEquipe> profissionalEquipe = new ArrayList<>();
 
 	public String getCpf() {
 		return cpf;

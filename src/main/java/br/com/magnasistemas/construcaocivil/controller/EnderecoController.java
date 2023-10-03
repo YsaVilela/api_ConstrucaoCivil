@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.magnasistemas.construcaocivil.DTO.projeto.DadosDetalhamentoEndereco;
+import br.com.magnasistemas.construcaocivil.dto.projeto.DadosDetalhamentoEndereco;
 import br.com.magnasistemas.construcaocivil.repository.EnderecoRepository;
 
 @RestController
@@ -22,8 +22,8 @@ public class EnderecoController {
 	@GetMapping
 	public ResponseEntity<Page<DadosDetalhamentoEndereco>> listar (
 			@PageableDefault(size = 1, sort = {"id"}) Pageable paginacao) {
-		var ListagemDeEstados = repository.findAll(paginacao).map(DadosDetalhamentoEndereco::new);
-		return ResponseEntity.ok(ListagemDeEstados);
+		Page<DadosDetalhamentoEndereco> listagemDeEstados = repository.findAll(paginacao).map(DadosDetalhamentoEndereco::new);
+		return ResponseEntity.ok(listagemDeEstados);
 	}
 
 }

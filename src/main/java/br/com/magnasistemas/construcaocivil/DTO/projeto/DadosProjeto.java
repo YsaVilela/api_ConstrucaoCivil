@@ -1,4 +1,4 @@
-package br.com.magnasistemas.construcaocivil.DTO.projeto;
+package br.com.magnasistemas.construcaocivil.dto.projeto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;

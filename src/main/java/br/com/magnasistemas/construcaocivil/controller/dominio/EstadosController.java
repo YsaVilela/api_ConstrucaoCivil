@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.magnasistemas.construcaocivil.DTO.dominio.DadosEstados;
+import br.com.magnasistemas.construcaocivil.dto.dominio.DadosEstados;
 import br.com.magnasistemas.construcaocivil.repository.dominio.EstadosRepository;
 
 @RestController
@@ -22,9 +22,9 @@ public class EstadosController {
 	@GetMapping
 	public ResponseEntity<Page<DadosEstados>> listar (
 			@PageableDefault(size = 10, sort = {"id"}) Pageable paginacao) {
-		var ListagemDeEstados = repository.findAll(paginacao).map(DadosEstados::new);
-		return ResponseEntity.ok(ListagemDeEstados);
+		Page<DadosEstados> listagemDeEstados = repository.findAll(paginacao).map(DadosEstados::new);
+		return ResponseEntity.ok(listagemDeEstados);
 		
 	}
 
-}
+} 

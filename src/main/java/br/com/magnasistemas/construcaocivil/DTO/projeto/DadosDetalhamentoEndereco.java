@@ -1,4 +1,4 @@
-package br.com.magnasistemas.construcaocivil.DTO.projeto;
+package br.com.magnasistemas.construcaocivil.dto.projeto;
 
 import br.com.magnasistemas.construcaocivil.entity.Endereco;
 import br.com.magnasistemas.construcaocivil.entity.Projeto;

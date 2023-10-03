@@ -17,10 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.magnasistemas.construcaocivil.DTO.construtora.DadosAtualizarConstrutora;
-import br.com.magnasistemas.construcaocivil.DTO.construtora.DadosConstrutora;
-import br.com.magnasistemas.construcaocivil.DTO.construtora.DadosDetalhamentoConstrutora;
-import br.com.magnasistemas.construcaocivil.entity.Construtora;
+import br.com.magnasistemas.construcaocivil.dto.construtora.DadosAtualizarConstrutora;
+import br.com.magnasistemas.construcaocivil.dto.construtora.DadosConstrutora;
+import br.com.magnasistemas.construcaocivil.dto.construtora.DadosDetalhamentoConstrutora;
 import br.com.magnasistemas.construcaocivil.service.ConstrutoraService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -33,11 +32,10 @@ public class ConstrutoraController {
 	private ConstrutoraService service;
 	
 	
-	@PostMapping
+	@PostMapping ("/cadastrar")
 	@Transactional
-	public ResponseEntity<Construtora> cadastrar (@RequestBody @Valid DadosConstrutora dados) {
-		service.criarConstrutora(dados);	
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+	public ResponseEntity<Optional<DadosDetalhamentoConstrutora>> cadastrar (@RequestBody @Valid DadosConstrutora dados) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(service.criarConstrutora(dados));
 	}
  
 	@GetMapping ("/buscar/{id}")
@@ -57,12 +55,20 @@ public class ConstrutoraController {
 		return ResponseEntity.ok(service.listarTodos(paginacao)); 
 	}
 	
-	@PutMapping ("atualizar")
+	@PutMapping ("/atualizar")
 	@Transactional
 	public ResponseEntity<DadosDetalhamentoConstrutora> atualizar(@RequestBody @Valid DadosAtualizarConstrutora dados){
 		return ResponseEntity.ok(service.atualizar(dados)) ;
 	}
-	 
+	
+	
+	@PutMapping ("ativar/{id}")
+	@Transactional
+	public ResponseEntity<DadosDetalhamentoConstrutora> ativar(@PathVariable Long id){
+		return ResponseEntity.ok(service.ativar(id));
+	}
+	
+	
 	@DeleteMapping ("desativar/{id}")
 	@Transactional
 	public ResponseEntity<DadosDetalhamentoConstrutora> desativar(@PathVariable Long id){
@@ -70,10 +76,10 @@ public class ConstrutoraController {
 	}
 	
 	@DeleteMapping ("deletar/{id}")
-	@Transactional
-	public ResponseEntity<Construtora> deletar(@PathVariable Long id){
+	@Transactional 
+	public ResponseEntity<HttpStatus> deletar(@PathVariable Long id){
 		service.deletar(id);
-		return ResponseEntity.noContent().build();
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
 	

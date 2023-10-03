@@ -17,11 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.magnasistemas.construcaocivil.DTO.cargo.DadosAtualizarCargo;
-import br.com.magnasistemas.construcaocivil.DTO.cargo.DadosCargo;
-import br.com.magnasistemas.construcaocivil.DTO.cargo.DadosDetalhamentoCargo;
-import br.com.magnasistemas.construcaocivil.entity.Cargo;
-import br.com.magnasistemas.construcaocivil.entity.Projeto;
+import br.com.magnasistemas.construcaocivil.dto.cargo.DadosAtualizarCargo;
+import br.com.magnasistemas.construcaocivil.dto.cargo.DadosCargo;
+import br.com.magnasistemas.construcaocivil.dto.cargo.DadosDetalhamentoCargo;
 import br.com.magnasistemas.construcaocivil.service.CargoService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -31,13 +29,12 @@ import jakarta.validation.Valid;
 public class CargoController{
 	
 	@Autowired 
-	private CargoService service;
+	private CargoService service; 
 	
 		@PostMapping ("cadastrar")
 		@Transactional
-		public ResponseEntity<Projeto> cadastrar (@RequestBody @Valid DadosCargo dados) {
-			service.criarCargo(dados);
-			return ResponseEntity.status(HttpStatus.CREATED).build();
+		public ResponseEntity<Optional<DadosDetalhamentoCargo>> cadastrar (@RequestBody @Valid DadosCargo dados) {
+			return ResponseEntity.status(HttpStatus.CREATED).body(service.criarCargo(dados));
 		}
 		
 		@GetMapping ("/buscar/{id}")
@@ -59,9 +56,9 @@ public class CargoController{
 		
 		@DeleteMapping ("deletar/{id}")
 		@Transactional
-		public ResponseEntity<Cargo> deletar(@PathVariable Long id){
-			service.deletar(id);
-			return ResponseEntity.noContent().build();
+		public ResponseEntity<HttpStatus> deletar(@PathVariable Long id){
+			service.deletar(id); 
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 		}
 
 }
