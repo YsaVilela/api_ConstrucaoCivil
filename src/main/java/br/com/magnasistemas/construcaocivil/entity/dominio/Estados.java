@@ -3,11 +3,12 @@ package br.com.magnasistemas.construcaocivil.entity.dominio;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
@@ -28,9 +29,9 @@ public class Estados {
 	@Column(name = "regiao")
 	private String regiao;
 	
-	@OneToMany(cascade = CascadeType.ALL)
-	@JoinColumn(name = "fk_estado")
-	protected List<Cidade> cidade = new ArrayList<>();
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "estado")
+	@JsonIgnore
+	private List<Cidade> cidade = new ArrayList<>();
 	
 	
 	public Long getId() {

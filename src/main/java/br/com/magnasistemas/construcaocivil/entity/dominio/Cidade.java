@@ -29,7 +29,7 @@ public class Cidade {
 	
 	@ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "fk_estado")
-	private Estados estado;
+	protected Estados estado;
 	
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "cidade")
     @JsonIgnore

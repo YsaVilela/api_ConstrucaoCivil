@@ -20,9 +20,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import br.com.magnasistemas.construcaocivil.dto.cargo.DadosAtualizarCargo;
 import br.com.magnasistemas.construcaocivil.dto.cargo.DadosCargo;
 import br.com.magnasistemas.construcaocivil.dto.cargo.DadosDetalhamentoCargo;
-import br.com.magnasistemas.construcaocivil.dto.equipe.DadosDetalhamentoEquipe;
 import br.com.magnasistemas.construcaocivil.repository.CargoRepository;
-import br.com.magnasistemas.construcaocivil.repository.ConstrutoraRepository;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -31,15 +29,15 @@ import br.com.magnasistemas.construcaocivil.repository.ConstrutoraRepository;
 class CargoControllerTest {
 	@Autowired
 	private TestRestTemplate restTemplate;
-	
+
 	@Autowired
 	private CargoRepository cargoRepository;
-	
+
 	void iniciarCargo() {
 		DadosCargo dadosCargo = new DadosCargo("Cargo Teste", 123.45);
 		restTemplate.postForEntity("/cargo/cadastrar", dadosCargo, DadosDetalhamentoCargo.class);
 	}
-	
+
 	@BeforeEach
 	void iniciar() {
 		cargoRepository.deleteAllAndResetSequence();
@@ -66,7 +64,7 @@ class CargoControllerTest {
 
 		assertTrue(response.getStatusCode().is2xxSuccessful());
 	}
-	
+
 	@Test
 	@DisplayName("Deve retornar um erro quando buscar um cargo por um id inválido")
 	void listarCargoPorIdInválido() {
@@ -75,7 +73,6 @@ class CargoControllerTest {
 				DadosDetalhamentoCargo.class);
 		assertTrue(response.getStatusCode().is5xxServerError());
 	}
-	
 
 	@Test
 	@DisplayName("Deve retornar codigo http 200 quando listar um cargo")
@@ -91,7 +88,7 @@ class CargoControllerTest {
 	@DisplayName("Deve devolver codigo http 200 quando atualizar um cargo")
 	void atualizarCargo() {
 		iniciarCargo();
-		
+
 		DadosAtualizarCargo dadosAtualizarCargo = new DadosAtualizarCargo(1L, "Cargo Atualizar", 543.21);
 
 		ResponseEntity<DadosDetalhamentoCargo> response = restTemplate.exchange("/cargo/atualizar", HttpMethod.PUT,
@@ -113,12 +110,12 @@ class CargoControllerTest {
 
 	@Test
 	@DisplayName("Deve retornar um 204 quando deletar")
-	void deletaCargo() { 
+	void deletaCargo() {
 		iniciarCargo();
-	
-		ResponseEntity response = restTemplate.exchange("/cargo/deletar/1", HttpMethod.DELETE , null, DadosDetalhamentoCargo.class); 
+
+		ResponseEntity response = restTemplate.exchange("/cargo/deletar/1", HttpMethod.DELETE, null,
+				DadosDetalhamentoCargo.class);
 		assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
 	}
-	 
 
 }

@@ -3,6 +3,7 @@ package br.com.magnasistemas.construcaocivil.controller;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,7 @@ import br.com.magnasistemas.construcaocivil.dto.construtora.DadosDetalhamentoCon
 import br.com.magnasistemas.construcaocivil.repository.ConstrutoraRepository;
 import br.com.magnasistemas.construcaocivil.repository.EquipeRepository;
 import br.com.magnasistemas.construcaocivil.repository.ProfissionalRepository;
+import br.com.magnasistemas.construcaocivil.repository.ProjetoRepository;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -33,15 +35,25 @@ class ConstrutoraControllerTest {
 
 	@Autowired
 	private ConstrutoraRepository construtoraRepository;
-	
+
 	@Autowired
 	private EquipeRepository equipeRepository;
-	
+
 	@Autowired
 	private ProfissionalRepository profissionalRepository;
 
-	@BeforeEach
+	@Autowired
+	private ProjetoRepository projetoRepository;
+
+	void iniciarConstrutora() {
+		DadosConstrutora dadosConstrutora = new DadosConstrutora("12345678901234", "Construtora Teste", "11912345678",
+				"teste@hotmail.com");
+		restTemplate.postForEntity("/construtora/cadastrar", dadosConstrutora, DadosDetalhamentoConstrutora.class);
+	}
+
+	@AfterEach
 	void iniciar() {
+		projetoRepository.deleteAllAndResetSequence();
 		equipeRepository.deleteAllAndResetSequence();
 		profissionalRepository.deleteAllAndResetSequence();
 		construtoraRepository.deleteAllAndResetSequence();
@@ -50,7 +62,6 @@ class ConstrutoraControllerTest {
 	@Test
 	@DisplayName("Deve retornar um created quando criado com sucesso")
 	void criarConstrutora() {
-
 		DadosConstrutora dadosConstrutora = new DadosConstrutora("12345678901234", "Construtora Teste", "11912345678",
 				"teste@hotmail.com");
 		ResponseEntity<DadosDetalhamentoConstrutora> response = restTemplate.postForEntity("/construtora/cadastrar",
@@ -60,19 +71,15 @@ class ConstrutoraControllerTest {
 
 	}
 
-	@Test 
-	@DisplayName("deve devolver codigo http 200 quando listar uma construtora por id")
-	void listarConstrutora() {
+	@Test
+	@DisplayName("deve devolver codigo http 200 quando buscar uma construtora por id")
+	void buscarConstrutoraPorId() {
+		iniciarConstrutora();
 
-		DadosConstrutora dadosConstrutora = new DadosConstrutora("12345678901234", "Construtora Teste", "11912345678",
-				"teste@hotmail.com");
-		restTemplate.postForEntity("/construtora/cadastrar",dadosConstrutora, DadosDetalhamentoConstrutora.class);
-		
 		ResponseEntity<DadosDetalhamentoConstrutora> response = restTemplate.getForEntity("/construtora/buscar/1",
 				DadosDetalhamentoConstrutora.class);
 
 		assertTrue(response.getStatusCode().is2xxSuccessful());
-
 	}
 
 	@Test
@@ -88,10 +95,7 @@ class ConstrutoraControllerTest {
 	@Test
 	@DisplayName("deve devolver codigo http 200 quando listar as construtoras")
 	void listarConstrutoras() {
-
-		DadosConstrutora dadosConstrutora = new DadosConstrutora("12345678901234", "Construtora Teste", "11912345678",
-				"teste@hotmail.com");
-		restTemplate.postForEntity("/construtora/cadastrar",dadosConstrutora, DadosDetalhamentoConstrutora.class);
+		iniciarConstrutora();
 
 		ResponseEntity<DadosDetalhamentoConstrutora> response = restTemplate.getForEntity("/construtora/listar/todos",
 				DadosDetalhamentoConstrutora.class);
@@ -103,11 +107,8 @@ class ConstrutoraControllerTest {
 	@Test
 	@DisplayName("deve devolver codigo http 200 quando listar as construtoras ativas")
 	void listarConstrutorasAtivas() {
+		iniciarConstrutora();
 
-		DadosConstrutora dadosConstrutora = new DadosConstrutora("12345678901234", "Construtora Teste", "11912345678",
-				"teste@hotmail.com");
-		restTemplate.postForEntity("/construtora/cadastrar",dadosConstrutora, DadosDetalhamentoConstrutora.class);
-		
 		ResponseEntity<DadosDetalhamentoConstrutora> response = restTemplate.getForEntity("/construtora/listar",
 				DadosDetalhamentoConstrutora.class);
 
@@ -116,14 +117,12 @@ class ConstrutoraControllerTest {
 	}
 
 	@Test
-	@DisplayName("deve devolver codigo http 200 quando atualizar uma Profissional")
+	@DisplayName("deve devolver codigo http 200 quando atualizar uma construtora")
 	void atualizarEConstrutora() {
-		DadosConstrutora dadosConstrutora = new DadosConstrutora("12345678901234", "Construtora Teste", "11912345678",
-				"teste@hotmail.com");
-		restTemplate.postForEntity("/construtora/cadastrar",dadosConstrutora, DadosDetalhamentoConstrutora.class);
+		iniciarConstrutora();
 
-		DadosAtualizarConstrutora dadosAtualizarConstrutora = new DadosAtualizarConstrutora(1L, "Construtora atualizada", "11987654321",
-				"testaAtualiza@gmail.com");
+		DadosAtualizarConstrutora dadosAtualizarConstrutora = new DadosAtualizarConstrutora(1L,
+				"Construtora atualizada", "11987654321", "testaAtualiza@gmail.com");
 		ResponseEntity<DadosAtualizarConstrutora> response = restTemplate.exchange("/construtora/atualizar",
 				HttpMethod.PUT, new HttpEntity<>(dadosAtualizarConstrutora), DadosAtualizarConstrutora.class);
 
@@ -136,8 +135,8 @@ class ConstrutoraControllerTest {
 	@DisplayName("deve retornar um erro quando atualizar com um id inválido")
 	void atualizarConstrutoraInvalido() {
 
-		DadosAtualizarConstrutora dadosAtualizarConstrutora = new DadosAtualizarConstrutora(1L, "Construtora atualizada", "11987654321",
-				"testaAtualiza@gmail.com");
+		DadosAtualizarConstrutora dadosAtualizarConstrutora = new DadosAtualizarConstrutora(1L,
+				"Construtora atualizada", "11987654321", "testaAtualiza@gmail.com");
 		ResponseEntity<DadosAtualizarConstrutora> response = restTemplate.exchange("/construtora/atualizar",
 				HttpMethod.PUT, new HttpEntity<>(dadosAtualizarConstrutora), DadosAtualizarConstrutora.class);
 
@@ -149,26 +148,21 @@ class ConstrutoraControllerTest {
 	@Test
 	@DisplayName("deve retornar um 204 quando desativar com um id válido")
 	void desativarConstrutora() {
-		DadosConstrutora dadosConstrutora = new DadosConstrutora("12345678901234", "Construtora Teste", "11912345678",
-				"teste@hotmail.com");
-		restTemplate.postForEntity("/construtora/cadastrar",dadosConstrutora, DadosDetalhamentoConstrutora.class);
-		
+		iniciarConstrutora();
+
 		ResponseEntity response = restTemplate.exchange("/construtora/desativar/1", HttpMethod.DELETE, null,
 				DadosDetalhamentoConstrutora.class);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 
 	}
-	
+
 	@Test
 	@DisplayName("Deve retornar codigo http 200 quando ativar uma Construtora")
 	void ativarConstrutora() {
-		DadosConstrutora dadosConstrutora = new DadosConstrutora("12345678901234", "Construtora Teste", "11912345678",
-				"teste@hotmail.com");
-		restTemplate.postForEntity("/construtora/cadastrar",dadosConstrutora, DadosDetalhamentoConstrutora.class);
-		
-		restTemplate.exchange("/construtora/desativar/1", HttpMethod.DELETE, null,
-				DadosDetalhamentoConstrutora.class);
-		
+		iniciarConstrutora();
+
+		restTemplate.exchange("/construtora/desativar/1", HttpMethod.DELETE, null, DadosDetalhamentoConstrutora.class);
+
 		ResponseEntity<DadosDetalhamentoConstrutora> response = restTemplate.exchange("/construtora/ativar/1",
 				HttpMethod.PUT, null, DadosDetalhamentoConstrutora.class);
 
@@ -176,8 +170,7 @@ class ConstrutoraControllerTest {
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 
 	}
-	
-	
+
 	@Test
 	@DisplayName("deve devolver um erro quando ativar uma construtora com um id inválido")
 	void ativarConstrutoraIdInvalido() {
@@ -189,14 +182,11 @@ class ConstrutoraControllerTest {
 		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
 
 	}
-	
 
 	@Test
 	@DisplayName("deve retornar um 204 quando deletar com um id válido")
 	void deletarConstrutora() {
-		DadosConstrutora dadosConstrutora = new DadosConstrutora("12345678901234", "Construtora Teste", "11912345678",
-				"teste@hotmail.com");
-		restTemplate.postForEntity("/construtora/cadastrar",dadosConstrutora, DadosDetalhamentoConstrutora.class);
+		iniciarConstrutora();
 
 		ResponseEntity response = restTemplate.exchange("/construtora/deletar/1", HttpMethod.DELETE, null,
 				DadosDetalhamentoConstrutora.class);

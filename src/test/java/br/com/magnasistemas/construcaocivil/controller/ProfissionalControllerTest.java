@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,7 @@ import br.com.magnasistemas.construcaocivil.repository.CargoRepository;
 import br.com.magnasistemas.construcaocivil.repository.ConstrutoraRepository;
 import br.com.magnasistemas.construcaocivil.repository.EquipeRepository;
 import br.com.magnasistemas.construcaocivil.repository.ProfissionalRepository;
+import br.com.magnasistemas.construcaocivil.repository.ProjetoRepository;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -55,6 +57,9 @@ class ProfissionalControllerTest {
 	
 	@Autowired
 	private EquipeRepository equipeRepository;
+	
+	@Autowired
+	private ProjetoRepository projetoRepository;
 
 	void iniciarConstrutora() {
 		DadosConstrutora dadosConstrutora = new DadosConstrutora("12345678901234", "Construtora Teste", "11912345678",
@@ -75,14 +80,16 @@ class ProfissionalControllerTest {
 
 	
 	@BeforeEach
-	void iniciar() {
-		equipeRepository.deleteAllAndResetSequence();
+	void iniciar() {	
+		iniciarCargo();
+		iniciarConstrutora();
+	}
+	
+	@AfterEach
+	void finlizar(){
 		profissionalRepository.deleteAllAndResetSequence();
 		cargoRepository.deleteAllAndResetSequence();
 		construtoraRepository.deleteAllAndResetSequence();
-		
-		iniciarCargo();
-		iniciarConstrutora();
 	}
 
 	@Test

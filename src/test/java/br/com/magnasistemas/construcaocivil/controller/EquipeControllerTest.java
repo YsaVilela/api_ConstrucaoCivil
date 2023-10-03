@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -45,6 +46,7 @@ import br.com.magnasistemas.construcaocivil.enumerator.Turno;
 import br.com.magnasistemas.construcaocivil.repository.ConstrutoraRepository;
 import br.com.magnasistemas.construcaocivil.repository.EquipeRepository;
 import br.com.magnasistemas.construcaocivil.repository.ProfissionalRepository;
+import br.com.magnasistemas.construcaocivil.repository.ProjetoRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
@@ -62,7 +64,9 @@ class EquipeControllerTest {
 	@Autowired
 	private ConstrutoraRepository construtoraRepository;
 	
-	
+	@Autowired
+	private ProjetoRepository projetoRepository;
+
 	
 	void iniciarConstrutora() {
 		DadosConstrutora dadosConstrutora = new DadosConstrutora("12345678901234", "Construtora Teste", "11912345678",
@@ -79,9 +83,14 @@ class EquipeControllerTest {
 	
 	@BeforeEach
 	void iniciar() { 
-		equipeRepository.deleteAllAndResetSequence();
-		construtoraRepository.deleteAllAndResetSequence();
 		iniciarConstrutora();
+	}
+	
+	@AfterEach
+	void finlizar(){
+		equipeRepository.deleteAllAndResetSequence();
+		projetoRepository.deleteAllAndResetSequence();
+		construtoraRepository.deleteAllAndResetSequence();
 	}
 
 	

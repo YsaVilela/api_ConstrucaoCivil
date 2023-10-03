@@ -3,6 +3,7 @@ package br.com.magnasistemas.construcaocivil.controller;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,7 +11,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +28,6 @@ import br.com.magnasistemas.construcaocivil.dto.profissional.DadosProfissional;
 import br.com.magnasistemas.construcaocivil.dto.profissional_equipe.DadosDetalhamentoProfissionalEquipe;
 import br.com.magnasistemas.construcaocivil.dto.profissional_equipe.DadosProfissionalEquipe;
 import br.com.magnasistemas.construcaocivil.enumerator.Turno;
-import br.com.magnasistemas.construcaocivil.repository.CargoRepository;
 import br.com.magnasistemas.construcaocivil.repository.ConstrutoraRepository;
 import br.com.magnasistemas.construcaocivil.repository.EquipeRepository;
 import br.com.magnasistemas.construcaocivil.repository.ProfissionalEquipeRepository;
@@ -52,10 +51,8 @@ class ProfissionalEquipeControllerTest {
 	private ProfissionalRepository profissionalRepository;
 	
 	@Autowired
-	private CargoRepository cargoRepository;
-	
-	@Autowired
 	private EquipeRepository equipeRepository;
+	
 
 	void iniciarConstrutora() {
 		DadosConstrutora dadosConstrutora = new DadosConstrutora("12345678901234", "Construtora Teste", "11912345678",
@@ -87,15 +84,18 @@ class ProfissionalEquipeControllerTest {
 
 	@BeforeEach
 	void iniciar() {
-		profissionalEquipeRepository.deleteAllAndResetSequence();
-		equipeRepository.deleteAllAndResetSequence();
-		profissionalRepository.deleteAllAndResetSequence();
-		cargoRepository.deleteAllAndResetSequence();
-		construtoraRepository.deleteAllAndResetSequence();
 		iniciarConstrutora();
 		iniciarCargo();
 		iniciarProfissional();
 		iniciarEquipe();
+	}
+	
+	@AfterEach
+	void finlizar(){
+		profissionalEquipeRepository.deleteAllAndResetSequence();
+		equipeRepository.deleteAllAndResetSequence();
+		profissionalRepository.deleteAllAndResetSequence();
+		construtoraRepository.deleteAllAndResetSequence();
 	}
 
 	@Test
