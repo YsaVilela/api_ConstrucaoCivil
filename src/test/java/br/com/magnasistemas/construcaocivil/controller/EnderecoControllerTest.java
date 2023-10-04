@@ -1,6 +1,7 @@
 package br.com.magnasistemas.construcaocivil.controller;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,9 +11,12 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 import br.com.magnasistemas.construcaocivil.dto.construtora.DadosConstrutora;
 import br.com.magnasistemas.construcaocivil.dto.construtora.DadosDetalhamentoConstrutora;
@@ -83,7 +87,7 @@ class EnderecoControllerTest {
 	}
 
 	@Test
-	@DisplayName("deve devolver codigo http 200 quando listar os estados")
+	@DisplayName("deve devolver codigo http 200 quando listar os endereços")
 	void listarEstados() {		
 		ResponseEntity<DadosDetalhamentoEndereco> response = restTemplate.getForEntity("/enderecos/listar",
 				DadosDetalhamentoEndereco.class);
@@ -102,13 +106,12 @@ class EnderecoControllerTest {
 	}
 	
 	@Test
-	@DisplayName("deve devolver codigo http 200 quando buscar um endereço por id")
+	@DisplayName("deve devolver codigo http 400 quando buscar um endereço invalido por id")
 	void listarEnderecoPorIdInvalido() {
 
-		ResponseEntity<DadosDetalhamentoEndereco> response = restTemplate.getForEntity("/enderecos/buscar/2",
-				DadosDetalhamentoEndereco.class);
+	    ResponseEntity<JsonNode> response = restTemplate.getForEntity("/enderecos/buscar/2", JsonNode.class);
 
-		assertTrue(response.getStatusCode().is5xxServerError());
+	    assertTrue(response.getStatusCode().is4xxClientError());
 	}
 	
 	
@@ -126,11 +129,10 @@ class EnderecoControllerTest {
 	@Test
 	@DisplayName("deve devolver codigo http 200 quando buscar um endereço por id do projeto")
 	void listarEnderecoPorIdProjetoInvalido() {
+		
+	    ResponseEntity<JsonNode> response = restTemplate.getForEntity("/enderecos/buscarProjeto/2", JsonNode.class);
 
-		ResponseEntity<DadosDetalhamentoEndereco> response = restTemplate.getForEntity("/enderecos/buscarProjeto/2",
-				DadosDetalhamentoEndereco.class);
-
-		assertTrue(response.getStatusCode().is5xxServerError());
+	    assertTrue(response.getStatusCode().is4xxClientError());
 	}
 	
 	

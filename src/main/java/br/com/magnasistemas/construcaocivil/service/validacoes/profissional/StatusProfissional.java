@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import br.com.magnasistemas.construcaocivil.entity.Profissional;
-import br.com.magnasistemas.construcaocivil.exception.EntidadeDesativada;
+import br.com.magnasistemas.construcaocivil.exception.EntidadeDesativadaException;
 import br.com.magnasistemas.construcaocivil.repository.ProfissionalRepository;
 
 @Component
@@ -17,7 +17,7 @@ public class StatusProfissional implements ValidadorProfissional {
 	public void validar(Long id) {
 		Profissional profissional = profissionalRepository.getReferenceById(id); 
 		if (!profissional.isStatus())
-			throw new EntidadeDesativada("Profissional desativado");		
+			throw new EntidadeDesativadaException("Profissional desativado");		
 	}
 
 }

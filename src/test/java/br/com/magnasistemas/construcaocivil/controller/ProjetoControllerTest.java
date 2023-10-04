@@ -18,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import br.com.magnasistemas.construcaocivil.dto.construtora.DadosConstrutora;
 import br.com.magnasistemas.construcaocivil.dto.construtora.DadosDetalhamentoConstrutora;
 import br.com.magnasistemas.construcaocivil.dto.projeto.DadosAtualizarProjeto;
@@ -115,13 +117,11 @@ class ProjetoControllerTest {
 
 		DadosProjeto projeto = new DadosProjeto(1L, "Projeto teste", 12345.67, "DESCRICAO", endereco);
 
-		ResponseEntity<DadosDetalhamentoProjeto> response = restTemplate.postForEntity("/projetos/cadastrar", projeto,
-				DadosDetalhamentoProjeto.class);
+		ResponseEntity<JsonNode> response = restTemplate.postForEntity("/projetos/cadastrar", projeto, JsonNode.class);
 
-		assertTrue(response.getStatusCode().is5xxServerError());
+		assertTrue(response.getStatusCode().is4xxClientError());
 	}
-	
-	 
+
 	@Test
 	@DisplayName("Deve retornar codigo http 200 quando listar um projeto por id")
 	void listarProjetoPorId() {
@@ -135,10 +135,9 @@ class ProjetoControllerTest {
 	@Test
 	@DisplayName("Deve retornar um erro quando listar um projeto por um id inválido")
 	void listarProjetoPorIdInválido() {
-		ResponseEntity<DadosDetalhamentoProjeto> response = restTemplate.getForEntity("/projetos/buscar/1",
-				DadosDetalhamentoProjeto.class);
+		ResponseEntity<JsonNode> response = restTemplate.getForEntity("/projetos/buscar/1", JsonNode.class);
 
-		assertTrue(response.getStatusCode().is5xxServerError());
+		assertTrue(response.getStatusCode().is4xxClientError());
 	}
 
 	@Test
@@ -172,10 +171,10 @@ class ProjetoControllerTest {
 		DadosAtualizarProjeto dadosAtualizarProjeto = new DadosAtualizarProjeto(1l, "Projeto Atualizado", 6543.21,
 				"Descricao");
 
-		ResponseEntity<DadosDetalhamentoProjeto> response = restTemplate.exchange("/projetos/atualizar", HttpMethod.PUT,
-				new HttpEntity<>(dadosAtualizarProjeto), DadosDetalhamentoProjeto.class);
+		ResponseEntity<JsonNode> response = restTemplate.exchange("/projetos/atualizar", HttpMethod.PUT,
+				new HttpEntity<>(dadosAtualizarProjeto), JsonNode.class);
 
-		assertTrue(response.getStatusCode().is5xxServerError());
+		assertTrue(response.getStatusCode().is4xxClientError());
 	}
 
 	@Test
@@ -183,8 +182,8 @@ class ProjetoControllerTest {
 	void deletarProjeto() {
 		iniciarProjeto();
 
-		ResponseEntity<DadosDetalhamentoProjeto> response = restTemplate.exchange("/projetos/deletar/1", HttpMethod.DELETE, null,
-				DadosDetalhamentoProjeto.class);
+		ResponseEntity<DadosDetalhamentoProjeto> response = restTemplate.exchange("/projetos/deletar/1",
+				HttpMethod.DELETE, null, DadosDetalhamentoProjeto.class);
 		assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
 	}
 

@@ -22,6 +22,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import br.com.magnasistemas.construcaocivil.dto.cargo.DadosAtualizarCargo;
 import br.com.magnasistemas.construcaocivil.dto.cargo.DadosCargo;
 import br.com.magnasistemas.construcaocivil.dto.cargo.DadosDetalhamentoCargo;
@@ -69,9 +71,7 @@ class CargoControllerTest {
 	}
 
 	private static Stream<Object[]> provideInvalidCargoData() {
-		return Stream.of(new Object[] { null, 1600.00 }, 
-				new Object[] { " ", 1600.00 }, 
-				new Object[] { "Cargo", null });
+		return Stream.of(new Object[] { null, 1600.00 }, new Object[] { " ", 1600.00 }, new Object[] { "Cargo", null });
 	}
 
 	@Test
@@ -85,16 +85,15 @@ class CargoControllerTest {
 
 		assertTrue(response.getStatusCode().is5xxServerError());
 	}
-	 
+
 	@Test
-	@DisplayName("Deve devolver codigo http 200 quando buscar um cargo por id")
+	@DisplayName("Deve devolver codigo http 400 quando criar um cargo com o slario abaixo do minimo")
 	void criarRemuneracaoInvalida() {
 		DadosCargo dadosCargo = new DadosCargo("Cargo Teste", 150.00);
+	
+		ResponseEntity<JsonNode> response = restTemplate.postForEntity("/cargo/cadastrar", dadosCargo, JsonNode.class);
 
-		ResponseEntity<DadosDetalhamentoCargo> response = restTemplate.postForEntity("/cargo/cadastrar", dadosCargo,
-				DadosDetalhamentoCargo.class);
-
-		assertTrue(response.getStatusCode().is5xxServerError());
+		assertTrue(response.getStatusCode().is4xxClientError());
 	}
 
 	@Test
@@ -111,9 +110,9 @@ class CargoControllerTest {
 	@DisplayName("Deve retornar um erro quando buscar um cargo por um id inválido")
 	void listarCargoPorIdInválido() {
 
-		ResponseEntity<DadosDetalhamentoCargo> response = restTemplate.getForEntity("/cargo/buscar/1",
-				DadosDetalhamentoCargo.class);
-		assertTrue(response.getStatusCode().is5xxServerError());
+		ResponseEntity<JsonNode> response = restTemplate.getForEntity("/cargo/buscar/1", JsonNode.class);
+
+		assertTrue(response.getStatusCode().is4xxClientError());
 	}
 
 	@Test
@@ -144,22 +143,22 @@ class CargoControllerTest {
 	void atualizarCargoInvalido() {
 		DadosAtualizarCargo dadosAtualizarCargo = new DadosAtualizarCargo(1L, "Cargo Atualizar", 1600.21);
 
-		ResponseEntity<DadosDetalhamentoCargo> response = restTemplate.exchange("/cargo/atualizar", HttpMethod.PUT,
-				new HttpEntity<>(dadosAtualizarCargo), DadosDetalhamentoCargo.class);
+		ResponseEntity<JsonNode> response = restTemplate.exchange("/cargo/atualizar", HttpMethod.PUT,
+				new HttpEntity<>(dadosAtualizarCargo), JsonNode.class);
 
-		assertTrue(response.getStatusCode().is5xxServerError());
+		assertTrue(response.getStatusCode().is4xxClientError());
 	}
-	
+
 	@Test
 	@DisplayName("Deve devolver codigo http 200 quando atualizar um cargo com remuneracao reduzida")
 	void atualizarCargoComRemunacaoMenor() {
 		iniciarCargo();
 		DadosAtualizarCargo dadosAtualizarCargo = new DadosAtualizarCargo(1L, "Cargo Atualizar", 1400.21);
 
-		ResponseEntity<DadosDetalhamentoCargo> response = restTemplate.exchange("/cargo/atualizar", HttpMethod.PUT,
-				new HttpEntity<>(dadosAtualizarCargo), DadosDetalhamentoCargo.class);
+		ResponseEntity<JsonNode> response = restTemplate.exchange("/cargo/atualizar", HttpMethod.PUT,
+				new HttpEntity<>(dadosAtualizarCargo), JsonNode.class);
 
-		assertTrue(response.getStatusCode().is5xxServerError());
+		assertTrue(response.getStatusCode().is4xxClientError());
 	}
 
 	@Test

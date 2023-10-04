@@ -1,10 +1,10 @@
 package br.com.magnasistemas.construcaocivil.exception;
 
-public class EntidadeDesativada extends RuntimeException {
+public class EntidadeDesativadaException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 	
-	public EntidadeDesativada(String mensage) {
+	public EntidadeDesativadaException(String mensage) {
         super(mensage);
     }
 

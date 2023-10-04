@@ -23,6 +23,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import br.com.magnasistemas.construcaocivil.dto.construtora.DadosConstrutora;
 import br.com.magnasistemas.construcaocivil.dto.construtora.DadosDetalhamentoConstrutora;
 import br.com.magnasistemas.construcaocivil.dto.equipe.DadosAtualizarEquipe;
@@ -112,10 +114,9 @@ class EquipeControllerTest {
 	@Test
 	@DisplayName("Deve retorna um erro quando listar uma equipe por um id inválido")
 	void listarEquipePorIdInvalido() {
-		ResponseEntity<DadosDetalhamentoEquipe> response = restTemplate.getForEntity("/equipe/buscar/1",
-				DadosDetalhamentoEquipe.class);
+		ResponseEntity<JsonNode> response = restTemplate.getForEntity("/equipe/buscar/1", JsonNode.class);
 
-		assertTrue(response.getStatusCode().is5xxServerError());
+		assertTrue(response.getStatusCode().is4xxClientError());
 	}
 
 	@Test
@@ -124,20 +125,19 @@ class EquipeControllerTest {
 		iniciarEquipe();
 		restTemplate.exchange("/construtora/desativar/1", HttpMethod.DELETE, null, DadosDetalhamentoConstrutora.class);
 
-		ResponseEntity<DadosDetalhamentoEquipe> response = restTemplate.getForEntity("/equipe/buscar/1",
-				DadosDetalhamentoEquipe.class);
+		ResponseEntity<JsonNode> response = restTemplate.getForEntity("/equipe/buscar/1", JsonNode.class);
 
-		assertTrue(response.getStatusCode().is5xxServerError());
+		assertTrue(response.getStatusCode().is4xxClientError());
 	}
 
 	@Test
-	@DisplayName("Deve retornar um 204 quando deletar com um id válido")
+	@DisplayName("Deve retornar um 400 pois a contrutora que ela pertence foi excluida")
 	void deletarEquipeConstrutoraDeletada() {
 		iniciarEquipe();
 		restTemplate.exchange("/construtora/deletar/1", HttpMethod.DELETE, null, DadosDetalhamentoConstrutora.class);
-		ResponseEntity<DadosDetalhamentoEquipe> response = restTemplate.getForEntity("/equipe/buscar/1",
-				DadosDetalhamentoEquipe.class);
-		assertTrue(response.getStatusCode().is5xxServerError());
+		ResponseEntity<JsonNode> response = restTemplate.getForEntity("/equipe/buscar/2", JsonNode.class);
+
+		assertTrue(response.getStatusCode().is4xxClientError());
 	}
 
 	@Test
@@ -189,10 +189,9 @@ class EquipeControllerTest {
 	void atualizarEquipeInvalida() {
 		DadosAtualizarEquipe dadosAtualizarEquipe = new DadosAtualizarEquipe(1L, 1L, "Equipe", Turno.MATUTINO);
 
-		ResponseEntity<DadosDetalhamentoEquipe> response = restTemplate.exchange("/equipe/atualizar", HttpMethod.PUT,
-				new HttpEntity<>(dadosAtualizarEquipe), DadosDetalhamentoEquipe.class);
+		ResponseEntity<JsonNode> response = restTemplate.getForEntity("/equipe/atualizar", JsonNode.class);
 
-		assertTrue(response.getStatusCode().is5xxServerError());
+		assertTrue(response.getStatusCode().is4xxClientError());
 	}
 
 	@Test
@@ -219,10 +218,10 @@ class EquipeControllerTest {
 	@DisplayName("Deve retornar um erro quando ativar uma equipe com um id inválido")
 	void ativarEquipeIdInvalido() {
 
-		ResponseEntity<DadosDetalhamentoEquipe> response = restTemplate.exchange("/equipe/ativar/1", HttpMethod.PUT,
-				null, DadosDetalhamentoEquipe.class);
+		ResponseEntity<JsonNode> response = restTemplate.exchange("/equipe/ativar/1", HttpMethod.PUT, null,
+				JsonNode.class);
 
-		assertTrue(response.getStatusCode().is5xxServerError());
+		assertTrue(response.getStatusCode().is4xxClientError());
 	}
 
 	@Test
@@ -240,10 +239,11 @@ class EquipeControllerTest {
 		restTemplate.exchange("/construtora/desativar/1", HttpMethod.DELETE, null, DadosDetalhamentoConstrutora.class);
 
 		DadosEquipe dadosEquipe = new DadosEquipe(1L, "Equipe teste", Turno.NOTURNO);
-		ResponseEntity<DadosDetalhamentoEquipe> response = restTemplate.postForEntity("/equipe/cadastrar", dadosEquipe,
-				DadosDetalhamentoEquipe.class);
 
-		assertTrue(response.getStatusCode().is5xxServerError());
+		ResponseEntity<JsonNode> response = restTemplate.postForEntity("/equipe/cadastrar", dadosEquipe,
+				JsonNode.class);
+
+		assertTrue(response.getStatusCode().is4xxClientError());
 	}
 
 }

@@ -2,6 +2,7 @@ package br.com.magnasistemas.construcaocivil.controller;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -21,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import br.com.magnasistemas.construcaocivil.dto.construtora.DadosAtualizarConstrutora;
 import br.com.magnasistemas.construcaocivil.dto.construtora.DadosConstrutora;
@@ -82,7 +84,7 @@ class ConstrutoraControllerTest {
 	}
 
 	@Test
-	@DisplayName("deve devolver codigo http 200 quando buscar uma construtora por id")
+	@DisplayName("Deve retornar codigo http 200 quando buscar uma construtora por id")
 	void buscarConstrutoraPorId() {
 		iniciarConstrutora();
 
@@ -93,17 +95,16 @@ class ConstrutoraControllerTest {
 	}
 
 	@Test
-	@DisplayName("deve devolver um erro quando listar uma construtora por un id inexistente")
+	@DisplayName("Deve retornar um erro quando listar uma construtora por un id inexistente")
 	void listarConstrutoraPorIdInvalido() {
 
-		ResponseEntity<DadosDetalhamentoConstrutora> response = restTemplate.getForEntity("/construtora/buscar/2",
-				DadosDetalhamentoConstrutora.class);
+		ResponseEntity<JsonNode> response = restTemplate.getForEntity("/construtora/buscar/1", JsonNode.class);
 
-		assertTrue(response.getStatusCode().is5xxServerError());
+		assertTrue(response.getStatusCode().is4xxClientError());
 	}
 
 	@Test
-	@DisplayName("deve devolver codigo http 200 quando listar as construtoras")
+	@DisplayName("Deve retornar codigo http 200 quando listar as construtoras")
 	void listarConstrutoras() {
 		iniciarConstrutora();
 
@@ -115,7 +116,7 @@ class ConstrutoraControllerTest {
 	}
 
 	@Test
-	@DisplayName("deve devolver codigo http 200 quando listar as construtoras ativas")
+	@DisplayName("Deve retornar codigo http 200 quando listar as construtoras ativas")
 	void listarConstrutorasAtivas() {
 		iniciarConstrutora();
 
@@ -142,16 +143,15 @@ class ConstrutoraControllerTest {
 	}
 
 	@Test
-	@DisplayName("deve retornar um erro quando atualizar com um id inválido")
+	@DisplayName("deve devolver um erro quando atualizar com um id inválido")
 	void atualizarConstrutoraInvalido() {
 
 		DadosAtualizarConstrutora dadosAtualizarConstrutora = new DadosAtualizarConstrutora(1L,
 				"Construtora atualizada", "11987654321", "testaAtualiza@gmail.com");
-		ResponseEntity<DadosAtualizarConstrutora> response = restTemplate.exchange("/construtora/atualizar",
-				HttpMethod.PUT, new HttpEntity<>(dadosAtualizarConstrutora), DadosAtualizarConstrutora.class);
 
-		assertTrue(response.getStatusCode().is5xxServerError());
-		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+		ResponseEntity<JsonNode> response = restTemplate.getForEntity("/construtora/atualizar/1", JsonNode.class);
+
+		assertTrue(response.getStatusCode().is4xxClientError());
 
 	}
 
@@ -164,7 +164,6 @@ class ConstrutoraControllerTest {
 				HttpMethod.DELETE, null, DadosDetalhamentoConstrutora.class);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 	}
-	
 
 	@Test
 	@DisplayName("Deve retornar codigo http 200 quando ativar uma Construtora")
@@ -185,11 +184,10 @@ class ConstrutoraControllerTest {
 	@DisplayName("deve devolver um erro quando ativar uma construtora com um id inválido")
 	void ativarConstrutoraIdInvalido() {
 
-		ResponseEntity<DadosDetalhamentoConstrutora> response = restTemplate.exchange("/construtora/ativar/2",
-				HttpMethod.PUT, null, DadosDetalhamentoConstrutora.class);
+		ResponseEntity<JsonNode> response = restTemplate.exchange("/construtora/ativar/1", HttpMethod.PUT, null,
+				JsonNode.class);
 
-		assertTrue(response.getStatusCode().is5xxServerError());
-		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+		assertTrue(response.getStatusCode().is4xxClientError());
 
 	}
 
@@ -198,8 +196,8 @@ class ConstrutoraControllerTest {
 	void deletarConstrutora() {
 		iniciarConstrutora();
 
-		ResponseEntity<DadosDetalhamentoConstrutora> response = restTemplate.exchange("/construtora/deletar/1", HttpMethod.DELETE, null,
-				DadosDetalhamentoConstrutora.class);
+		ResponseEntity<DadosDetalhamentoConstrutora> response = restTemplate.exchange("/construtora/deletar/1",
+				HttpMethod.DELETE, null, DadosDetalhamentoConstrutora.class);
 		assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
 
 	}

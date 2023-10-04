@@ -17,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import br.com.magnasistemas.construcaocivil.dto.cargo.DadosCargo;
 import br.com.magnasistemas.construcaocivil.dto.cargo.DadosDetalhamentoCargo;
 import br.com.magnasistemas.construcaocivil.dto.construtora.DadosConstrutora;
@@ -43,16 +45,15 @@ class ProfissionalEquipeControllerTest {
 
 	@Autowired
 	private ProfissionalEquipeRepository profissionalEquipeRepository;
-	
+
 	@Autowired
 	private ConstrutoraRepository construtoraRepository;
 
 	@Autowired
 	private ProfissionalRepository profissionalRepository;
-	
+
 	@Autowired
 	private EquipeRepository equipeRepository;
-	
 
 	void iniciarConstrutora() {
 		DadosConstrutora dadosConstrutora = new DadosConstrutora("12345678901234", "Construtora Teste", "11912345678",
@@ -89,9 +90,9 @@ class ProfissionalEquipeControllerTest {
 		iniciarProfissional();
 		iniciarEquipe();
 	}
-	
+
 	@AfterEach
-	void finlizar(){
+	void finlizar() {
 		profissionalEquipeRepository.deleteAllAndResetSequence();
 		equipeRepository.deleteAllAndResetSequence();
 		profissionalRepository.deleteAllAndResetSequence();
@@ -109,25 +110,24 @@ class ProfissionalEquipeControllerTest {
 
 		assertEquals(HttpStatus.CREATED, response.getStatusCode());
 	}
-	
+
 	@Test
 	@DisplayName("Deve retornar um erro quando tenatr adicionar um profissional em uma equipe que não pertence a mesma construtora")
 	void criarProfissionalEquipeConstrutoraDiferentes() {
 		DadosConstrutora dadosConstrutora = new DadosConstrutora("12345678901235", "Construtora Teste", "11912345679",
 				"testeteste@hotmail.com");
 		restTemplate.postForEntity("/construtora/cadastrar", dadosConstrutora, DadosDetalhamentoConstrutora.class);
-		
+
 		DadosEquipe dadosEquipe = new DadosEquipe(2L, "Equipe teste", Turno.NOTURNO);
 		restTemplate.postForEntity("/equipe/cadastrar", dadosEquipe, DadosDetalhamentoEquipe.class);
-		
+
 		DadosProfissionalEquipe dadosProfissionalEquipe = new DadosProfissionalEquipe(2L, 1L);
 
-		ResponseEntity<DadosDetalhamentoProfissionalEquipe> response = restTemplate.postForEntity(
-				"/profissional/equipe/cadastrar", dadosProfissionalEquipe, DadosDetalhamentoProfissionalEquipe.class);
+		ResponseEntity<JsonNode> response = restTemplate.postForEntity("/profissional/equipe/cadastrar",
+				dadosProfissionalEquipe, JsonNode.class);
 
-		assertTrue(response.getStatusCode().is5xxServerError());
+		assertTrue(response.getStatusCode().is4xxClientError());
 	}
-	
 
 	@Test
 	@DisplayName("Deve retornar um erro quando criado com profissional desativado")
@@ -138,29 +138,27 @@ class ProfissionalEquipeControllerTest {
 
 		DadosProfissionalEquipe dadosProfissionalEquipe = new DadosProfissionalEquipe(1L, 1l);
 
-		ResponseEntity<DadosDetalhamentoProfissionalEquipe> response = restTemplate.postForEntity(
-				"/profissional/equipe/cadastrar", dadosProfissionalEquipe, DadosDetalhamentoProfissionalEquipe.class);
+		ResponseEntity<JsonNode> response = restTemplate.postForEntity("/profissional/equipe/cadastrar",
+				dadosProfissionalEquipe, JsonNode.class);
 
-		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+		assertTrue(response.getStatusCode().is4xxClientError());
 	}
-	
-	
+
 	@Test
 	@DisplayName("Deve retornar um erro quando criado com equipe desativada")
 	void criarProfissionalEquipeDesativada() {
 
-		restTemplate.exchange("/equipe/desativar/1", HttpMethod.DELETE, null,
-				DadosDetalhamentoProfissional.class);
+		restTemplate.exchange("/equipe/desativar/1", HttpMethod.DELETE, null, DadosDetalhamentoProfissional.class);
 
 		DadosProfissionalEquipe dadosProfissionalEquipe = new DadosProfissionalEquipe(1L, 1l);
 
-		ResponseEntity<DadosDetalhamentoProfissionalEquipe> response = restTemplate.postForEntity(
-				"/profissional/equipe/cadastrar", dadosProfissionalEquipe, DadosDetalhamentoProfissionalEquipe.class);
+		ResponseEntity<JsonNode> response = restTemplate.postForEntity("/profissional/equipe/cadastrar",
+				dadosProfissionalEquipe, JsonNode.class);
 
-		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+		assertTrue(response.getStatusCode().is4xxClientError());
+
 	}
 
-	
 	@Test
 	@DisplayName("Deve retornar codigo http 200 quando listar inserções de equipes por id")
 	void listarProfissionalEquipePorId() {
@@ -183,7 +181,6 @@ class ProfissionalEquipeControllerTest {
 		assertTrue(response.getStatusCode().is2xxSuccessful());
 	}
 
-	
 	@Test
 	@DisplayName("Deve retornar codigo http 200 quando listar as inserções")
 	void listarProfissionaisEquipes() {
@@ -196,7 +193,6 @@ class ProfissionalEquipeControllerTest {
 
 	}
 
-	
 	@Test
 	@DisplayName("Deve retornar um 204 quando deletar")
 	void deletarEquipe() {
@@ -207,5 +203,4 @@ class ProfissionalEquipeControllerTest {
 		assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
 	}
 
-	
 }
