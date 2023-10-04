@@ -44,12 +44,6 @@ import jakarta.persistence.Table;
 			return id;
 		}
 
-
-		public void setId(long id) {
-			this.id = id;
-		}
-
-
 		public String getCnpj() {
 			return cnpj;
 		}

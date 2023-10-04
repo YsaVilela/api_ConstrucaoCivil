@@ -14,4 +14,11 @@ public interface ProjetoRepository extends JpaRepository<Projeto,Long>{
 	@Query(value = "DELETE FROM tb_projeto; ALTER SEQUENCE tb_projeto_id_seq RESTART WITH 1", nativeQuery = true)
 	void deleteAllAndResetSequence();
 
+	@Modifying
+	@Query("""
+			delete from Projeto r
+			where r.construtora.id = :idConstrutora 
+			""")
+	void deleteByIdConstrutora(Long idConstrutora);
+
 }

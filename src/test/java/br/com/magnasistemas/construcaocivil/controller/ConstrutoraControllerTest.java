@@ -3,10 +3,14 @@ package br.com.magnasistemas.construcaocivil.controller;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.List;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,9 +26,6 @@ import br.com.magnasistemas.construcaocivil.dto.construtora.DadosAtualizarConstr
 import br.com.magnasistemas.construcaocivil.dto.construtora.DadosConstrutora;
 import br.com.magnasistemas.construcaocivil.dto.construtora.DadosDetalhamentoConstrutora;
 import br.com.magnasistemas.construcaocivil.repository.ConstrutoraRepository;
-import br.com.magnasistemas.construcaocivil.repository.EquipeRepository;
-import br.com.magnasistemas.construcaocivil.repository.ProfissionalRepository;
-import br.com.magnasistemas.construcaocivil.repository.ProjetoRepository;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -36,15 +37,6 @@ class ConstrutoraControllerTest {
 	@Autowired
 	private ConstrutoraRepository construtoraRepository;
 
-	@Autowired
-	private EquipeRepository equipeRepository;
-
-	@Autowired
-	private ProfissionalRepository profissionalRepository;
-
-	@Autowired
-	private ProjetoRepository projetoRepository;
-
 	void iniciarConstrutora() {
 		DadosConstrutora dadosConstrutora = new DadosConstrutora("12345678901234", "Construtora Teste", "11912345678",
 				"teste@hotmail.com");
@@ -53,9 +45,6 @@ class ConstrutoraControllerTest {
 
 	@AfterEach
 	void iniciar() {
-		projetoRepository.deleteAllAndResetSequence();
-		equipeRepository.deleteAllAndResetSequence();
-		profissionalRepository.deleteAllAndResetSequence();
 		construtoraRepository.deleteAllAndResetSequence();
 	}
 
@@ -68,7 +57,28 @@ class ConstrutoraControllerTest {
 				dadosConstrutora, DadosDetalhamentoConstrutora.class);
 
 		assertEquals(HttpStatus.CREATED, response.getStatusCode());
+	}
 
+	@ParameterizedTest
+	@MethodSource("provideInvalidConstrutoraData")
+	@DisplayName("Deve retornar erro quando algum campo é nulo")
+	void criarConstrutoraComCamposNulos(String cpf, String nome, String telefone, String email) {
+		DadosConstrutora dadosConstrutora = new DadosConstrutora(cpf, nome, telefone, email);
+		ResponseEntity response = restTemplate.postForEntity("/construtora/cadastrar", dadosConstrutora, List.class);
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+	}
+
+	private static Stream<Object[]> provideInvalidConstrutoraData() {
+		return Stream.of(new Object[] { null, "Construtora", "11987654321", "teste@hotmail.com" },
+				new Object[] { " ", "Construtora", "11987654321", "teste@hotmail.com" },
+				new Object[] { "1234567890123", null, "11987654321", "teste@hotmail.com" },
+				new Object[] { "12345678901234", null, "11987654321", "teste@hotmail.com" },
+				new Object[] { "12345678901234", " ", "11987654321", "teste@hotmail.com" },
+				new Object[] { "12345678901234", "Construtora", null, "teste@hotmail.com" },
+				new Object[] { "12345678901234", "Construtora", " ", "teste@hotmail.com" },
+				new Object[] { "12345678901234", "Construtora", "1191234567", "teste@hotmail.com" },
+				new Object[] { "12345678901234", "Construtora", "11987654321", "teste" },
+				new Object[] { "12345678901234", "Construtora", "11987654321", " " });
 	}
 
 	@Test
@@ -150,11 +160,11 @@ class ConstrutoraControllerTest {
 	void desativarConstrutora() {
 		iniciarConstrutora();
 
-		ResponseEntity response = restTemplate.exchange("/construtora/desativar/1", HttpMethod.DELETE, null,
-				DadosDetalhamentoConstrutora.class);
+		ResponseEntity<DadosDetalhamentoConstrutora> response = restTemplate.exchange("/construtora/desativar/1",
+				HttpMethod.DELETE, null, DadosDetalhamentoConstrutora.class);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
-
 	}
+	
 
 	@Test
 	@DisplayName("Deve retornar codigo http 200 quando ativar uma Construtora")
@@ -188,7 +198,7 @@ class ConstrutoraControllerTest {
 	void deletarConstrutora() {
 		iniciarConstrutora();
 
-		ResponseEntity response = restTemplate.exchange("/construtora/deletar/1", HttpMethod.DELETE, null,
+		ResponseEntity<DadosDetalhamentoConstrutora> response = restTemplate.exchange("/construtora/deletar/1", HttpMethod.DELETE, null,
 				DadosDetalhamentoConstrutora.class);
 		assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
 

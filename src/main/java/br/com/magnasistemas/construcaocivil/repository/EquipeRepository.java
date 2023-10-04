@@ -18,4 +18,17 @@ public interface EquipeRepository extends JpaRepository<Equipe,Long>{
 	@Query(value = "DELETE FROM tb_equipe; ALTER SEQUENCE tb_equipe_id_seq RESTART WITH 1", nativeQuery = true)
 	void deleteAllAndResetSequence();
 
+	@Modifying
+	@Query("""
+			delete from Equipe r
+			where r.construtora.id = :idConstrutora 
+			""")
+	void deleteByIdConstrutora(Long idConstrutora);
+
+	@Query("""
+			select r from Equipe r
+			where r.construtora.id = :idConstrutora 
+			""")
+	Equipe findByIdConstrutora(Long idConstrutora);
+
 }

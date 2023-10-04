@@ -29,4 +29,11 @@ public interface EnderecoRepository extends JpaRepository<Endereco, Long> {
 			""")
 	Optional<Endereco> findByIdProjeto(Long idProjeto);
 
+	@Modifying
+	@Query("""
+			delete from Endereco r
+			where r.projeto.construtora.id = :idConstrutora
+			""")
+	void deletarByIdProjetoConstrutora(Long idConstrutora);
+
 }

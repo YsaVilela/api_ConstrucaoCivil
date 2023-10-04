@@ -101,4 +101,9 @@ public class ProjetoService {
 		projetoRepository.deleteById(id);
 	}
 
+	public void deleteByIdConstrutora(Long idConstrutora) {
+		enderecoRepository.deletarByIdProjetoConstrutora(idConstrutora);
+		projetoRepository.deleteByIdConstrutora(idConstrutora);
+	}
+
 }

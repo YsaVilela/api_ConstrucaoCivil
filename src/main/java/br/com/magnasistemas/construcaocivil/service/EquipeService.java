@@ -24,89 +24,107 @@ import jakarta.validation.Valid;
 public class EquipeService {
 	@Autowired
 	private EquipeRepository equipeRepository;
-	
+
 	@Autowired
 	private ConstrutoraRepository construtoraRepository;
-	
+
 	@Autowired
 	private ProfissionalEquipeRepository profissionalEquipeRepository;
-	
+
 	@Autowired
 	private List<ValidadorConstrutora> validadoresConstrutora;
-	
+
 	@Autowired
 	private List<ValidadorEquipe> validadoresEquipe;
-	
-	
+
 	public Optional<DadosDetalhamentoEquipe> criarEquipe(DadosEquipe dados) {
 
 		validadoresConstrutora.forEach(v -> v.validar(dados.idConstrutora()));
-		
+
 		Equipe equipe = new Equipe();
 		equipe.setConstrutora(construtoraRepository.getReferenceById(dados.idConstrutora()));
 		equipe.setNome(dados.nome());
 		equipe.setTurno(dados.turno());
 		equipe.setStatus(true);
-		
+
 		equipeRepository.save(equipe);
-		
+
 		return equipeRepository.findById(equipe.getId()).map(DadosDetalhamentoEquipe::new);
 	}
 
 	public Optional<DadosDetalhamentoEquipe> buscarPorId(Long id) {
-		
+
 		validadoresEquipe.forEach(v -> v.validar(id));
 
-        return equipeRepository.findById(id).map(DadosDetalhamentoEquipe::new); 
+		return equipeRepository.findById(id).map(DadosDetalhamentoEquipe::new);
 	}
 
-	
 	public Page<DadosDetalhamentoEquipe> listar(Pageable paginacao) {
-        return equipeRepository.findAllByStatusTrue(paginacao).map(DadosDetalhamentoEquipe::new);
-	} 
-	
+		return equipeRepository.findAllByStatusTrue(paginacao).map(DadosDetalhamentoEquipe::new);
+	}
+
 	public Page<DadosDetalhamentoEquipe> listarTodos(Pageable paginacao) {
-        return equipeRepository.findAll(paginacao).map(DadosDetalhamentoEquipe::new);
+		return equipeRepository.findAll(paginacao).map(DadosDetalhamentoEquipe::new);
 	}
 
 	public DadosDetalhamentoEquipe atualizar(@Valid DadosAtualizarEquipe dados) {
-		
+
 		validadoresEquipe.forEach(v -> v.validar(dados.id()));
 		validadoresConstrutora.forEach(v -> v.validar(dados.idConstrutora()));
-		
+
 		Equipe equipe = equipeRepository.getReferenceById(dados.id());
-			equipe.setConstrutora(construtoraRepository.getReferenceById(dados.id()));
-			equipe.setNome(dados.nome());
-			equipe.setTurno(dados.turno());
-			equipeRepository.save(equipe);
-		return new DadosDetalhamentoEquipe(equipe);
-	}
-	
-	public DadosDetalhamentoEquipe ativar(Long id) {
-		Optional<Equipe> validarEquipe = equipeRepository.findById(id);
-		if (validarEquipe.isEmpty()) 
-			throw new BuscarException ("Equipe não encontrado");
-		
-		Equipe equipe = equipeRepository.getReferenceById(id);
-			equipe.setStatus(true);
-			equipeRepository.save(equipe);
+		equipe.setConstrutora(construtoraRepository.getReferenceById(dados.id()));
+		equipe.setNome(dados.nome());
+		equipe.setTurno(dados.turno());
+		equipeRepository.save(equipe);
 		return new DadosDetalhamentoEquipe(equipe);
 	}
 
-	
+	public DadosDetalhamentoEquipe ativar(Long id) {
+		Optional<Equipe> validarEquipe = equipeRepository.findById(id);
+		if (validarEquipe.isEmpty())
+			throw new BuscarException("Equipe não encontrado");
+
+		Equipe equipe = equipeRepository.getReferenceById(id);
+		equipe.setStatus(true);
+		equipeRepository.save(equipe);
+		return new DadosDetalhamentoEquipe(equipe);
+	}
+
 	public DadosDetalhamentoEquipe desativar(Long id) {
 		validadoresEquipe.forEach(v -> v.validar(id));
-		
+
 		Equipe equipe = equipeRepository.getReferenceById(id);
-			equipe.setStatus(false);
-			equipeRepository.save(equipe);
+		equipe.setStatus(false);
+		equipeRepository.save(equipe);
 		return new DadosDetalhamentoEquipe(equipe);
 	}
 
 	public void deletar(Long id) {
-		equipeRepository.deleteById(id);
 		profissionalEquipeRepository.deleteByIdEquipe(id);
+		equipeRepository.deleteById(id);
 	}
- 
+
+	public void deleteByIdConstrutora(Long idConstrutora) {
+		profissionalEquipeRepository.deleteByIdEquipeConstrutora(idConstrutora);
+		equipeRepository.deleteByIdConstrutora(idConstrutora);
+	}
+
+	public void construtoraDesativada(Long id) {
+		Equipe equipe = equipeRepository.findByIdConstrutora(id);
+		if (equipe != null) {
+			equipe.setStatus(false);
+			equipeRepository.save(equipe);
+		}
+
+	}
+
+	public void construtoraAtivada(Long id) {
+		Equipe equipe = equipeRepository.findByIdConstrutora(id);
+		if (equipe != null) {
+			equipe.setStatus(true);
+			equipeRepository.save(equipe);
+		}
+	}
 
 }

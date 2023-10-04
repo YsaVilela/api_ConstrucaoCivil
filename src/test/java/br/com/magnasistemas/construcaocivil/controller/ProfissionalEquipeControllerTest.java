@@ -61,7 +61,7 @@ class ProfissionalEquipeControllerTest {
 	}
 
 	void iniciarCargo() {
-		DadosCargo dadosCargo = new DadosCargo("Cargo Teste", 123.45);
+		DadosCargo dadosCargo = new DadosCargo("Cargo Teste", 1600.45);
 		restTemplate.postForEntity("/cargo/cadastrar", dadosCargo, DadosDetalhamentoCargo.class);
 	}
 
@@ -109,6 +109,25 @@ class ProfissionalEquipeControllerTest {
 
 		assertEquals(HttpStatus.CREATED, response.getStatusCode());
 	}
+	
+	@Test
+	@DisplayName("Deve retornar um erro quando tenatr adicionar um profissional em uma equipe que não pertence a mesma construtora")
+	void criarProfissionalEquipeConstrutoraDiferentes() {
+		DadosConstrutora dadosConstrutora = new DadosConstrutora("12345678901235", "Construtora Teste", "11912345679",
+				"testeteste@hotmail.com");
+		restTemplate.postForEntity("/construtora/cadastrar", dadosConstrutora, DadosDetalhamentoConstrutora.class);
+		
+		DadosEquipe dadosEquipe = new DadosEquipe(2L, "Equipe teste", Turno.NOTURNO);
+		restTemplate.postForEntity("/equipe/cadastrar", dadosEquipe, DadosDetalhamentoEquipe.class);
+		
+		DadosProfissionalEquipe dadosProfissionalEquipe = new DadosProfissionalEquipe(2L, 1L);
+
+		ResponseEntity<DadosDetalhamentoProfissionalEquipe> response = restTemplate.postForEntity(
+				"/profissional/equipe/cadastrar", dadosProfissionalEquipe, DadosDetalhamentoProfissionalEquipe.class);
+
+		assertTrue(response.getStatusCode().is5xxServerError());
+	}
+	
 
 	@Test
 	@DisplayName("Deve retornar um erro quando criado com profissional desativado")

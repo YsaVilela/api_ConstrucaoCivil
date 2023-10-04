@@ -27,89 +27,87 @@ public class ProfissionalService {
 
 	@Autowired
 	private ProfissionalRepository profissionalRepository;
-	
+
 	@Autowired
 	private ConstrutoraRepository construtoraRepository;
-	
+
 	@Autowired
 	private CargoRepository cargoRepository;
-	
+
 	@Autowired
 	private ProfissionalEquipeRepository profissionalEquipeRepository;
-	
+
 	@Autowired
 	private List<ValidadorConstrutora> validadoresConstrutora;
-	
+
 	@Autowired
 	private List<ValidadorCargo> validadoresCargo;
-	
+
 	@Autowired
 	private List<ValidadorProfissional> validadoresProfissional;
-	
-	
+
 	public Optional<DadosDetalhamentoProfissional> criarProfissional(DadosProfissional dados) {
 		Profissional profissional = new Profissional();
-		
+
 		validadoresConstrutora.forEach(v -> v.validar(dados.idConstrutora()));
-		validadoresCargo.forEach(v -> v.validar(dados.idCargo()));		
-	
+		validadoresCargo.forEach(v -> v.validar(dados.idCargo()));
+
 		profissional.setConstrutora(construtoraRepository.getReferenceById(dados.idConstrutora()));
 		profissional.setCpf(dados.cpf());
 		profissional.setNome(dados.nome());
 		profissional.setTelefone(dados.telefone());
 		profissional.setCargo(cargoRepository.getReferenceById(dados.idCargo()));
 		profissional.setStatus(true);
-		
+
 		profissionalRepository.save(profissional);
-		
+
 		return profissionalRepository.findById(profissional.getId()).map(DadosDetalhamentoProfissional::new);
 	}
 
 	public Optional<DadosDetalhamentoProfissional> buscarPorId(Long id) {
-		validadoresProfissional.forEach(v -> v.validar(id));	
-        return profissionalRepository.findById(id).map(DadosDetalhamentoProfissional::new); 
+		validadoresProfissional.forEach(v -> v.validar(id));
+		return profissionalRepository.findById(id).map(DadosDetalhamentoProfissional::new);
 	}
 
 	public Page<DadosDetalhamentoProfissional> listar(Pageable paginacao) {
-        return profissionalRepository.findAllByStatusTrue(paginacao).map(DadosDetalhamentoProfissional::new);
-	} 
-	
+		return profissionalRepository.findAllByStatusTrue(paginacao).map(DadosDetalhamentoProfissional::new);
+	}
+
 	public Page<DadosDetalhamentoProfissional> listarTodos(Pageable paginacao) {
-        return profissionalRepository.findAll(paginacao).map(DadosDetalhamentoProfissional::new);
+		return profissionalRepository.findAll(paginacao).map(DadosDetalhamentoProfissional::new);
 	}
 
 	public DadosDetalhamentoProfissional atualizar(@Valid DadosAtualizarProfissional dados) {
-		validadoresProfissional.forEach(v -> v.validar(dados.id()));	
-		validadoresCargo.forEach(v -> v.validar(dados.idCargo()));	
+		validadoresProfissional.forEach(v -> v.validar(dados.id()));
+		validadoresCargo.forEach(v -> v.validar(dados.idCargo()));
 		validadoresConstrutora.forEach(v -> v.validar(dados.idConstrutora()));
 
-		
 		Profissional profissional = profissionalRepository.getReferenceById(dados.id());
-			profissional.setConstrutora(construtoraRepository.getReferenceById(dados.id()));
-			profissional.setNome(dados.nome());
-			profissional.setTelefone(dados.telefone());
-			profissional.setCargo(cargoRepository.getReferenceById(dados.idCargo()));
-		profissionalRepository.save(profissional); 
+		profissional.setConstrutora(construtoraRepository.getReferenceById(dados.id()));
+		profissional.setNome(dados.nome());
+		profissional.setTelefone(dados.telefone());
+		profissional.setCargo(cargoRepository.getReferenceById(dados.idCargo()));
+		profissionalRepository.save(profissional);
 		return new DadosDetalhamentoProfissional(profissional);
 	}
-	
+
 	public DadosDetalhamentoProfissional ativar(Long id) {
 		Optional<Profissional> validarProfissional = profissionalRepository.findById(id);
-		if (validarProfissional.isEmpty()) 
-			throw new BuscarException ("Profissional não encontrado");			
+		if (validarProfissional.isEmpty())
+			throw new BuscarException("Profissional não encontrado");
 
 		Profissional profissional = profissionalRepository.getReferenceById(id);
-			profissional.setStatus(true);
-			profissionalRepository.save(profissional);
+		profissional.setStatus(true);
+		profissionalRepository.save(profissional);
 		return new DadosDetalhamentoProfissional(profissional);
-	} 
+	}
 
 	public DadosDetalhamentoProfissional desativar(Long id) {
-		validadoresProfissional.forEach(v -> v.validar(id));	
-		
+		validadoresProfissional.forEach(v -> v.validar(id));
+
 		Profissional profissional = profissionalRepository.getReferenceById(id);
-			profissional.setStatus(false);
-			profissionalRepository.save(profissional);
+		profissional.setStatus(false);
+		profissionalRepository.save(profissional);
 		return new DadosDetalhamentoProfissional(profissional);
 	}
 
@@ -117,6 +115,26 @@ public class ProfissionalService {
 		profissionalRepository.deleteById(id);
 		profissionalEquipeRepository.deleteByIdProfissional(id);
 	}
- 
+
+	public void deleteByIdConstrutora(Long idConstrutora) {
+		profissionalEquipeRepository.deleteByIdProfissionalConstrutora(idConstrutora);
+		profissionalRepository.deleteByIdConstrutora(idConstrutora);
+	}
+
+	public void construtoraDesativada(Long id) {
+		Profissional profissional = profissionalRepository.findByIdConstrutora(id);
+		if (profissional != null) {
+			profissional.setStatus(false);
+			profissionalRepository.save(profissional);
+		}
+	}
+
+	public void construtoraAtivada(Long id) {
+		Profissional profissional = profissionalRepository.findByIdConstrutora(id);
+		if (profissional != null) {
+			profissional.setStatus(true);
+			profissionalRepository.save(profissional);
+		}
+	}
 
 }

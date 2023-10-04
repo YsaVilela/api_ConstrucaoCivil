@@ -10,7 +10,10 @@ import org.springframework.stereotype.Service;
 
 import br.com.magnasistemas.construcaocivil.dto.profissional_equipe.DadosDetalhamentoProfissionalEquipe;
 import br.com.magnasistemas.construcaocivil.dto.profissional_equipe.DadosProfissionalEquipe;
+import br.com.magnasistemas.construcaocivil.entity.Equipe;
+import br.com.magnasistemas.construcaocivil.entity.Profissional;
 import br.com.magnasistemas.construcaocivil.entity.ProfissionalEquipe;
+import br.com.magnasistemas.construcaocivil.exception.DadosInvalidosException;
 import br.com.magnasistemas.construcaocivil.repository.EquipeRepository;
 import br.com.magnasistemas.construcaocivil.repository.ProfissionalEquipeRepository;
 import br.com.magnasistemas.construcaocivil.repository.ProfissionalRepository;
@@ -41,11 +44,19 @@ public class ProfissionalEquipeService {
 
 		validadoresEquipe.forEach(v -> v.validar(dados.idEquipe()));
 		validadoresProfissional.forEach(v -> v.validar(dados.idProfissional()));	
-
-		profissionalEquipe.setEquipe(equipeRepository.getReferenceById(dados.idEquipe()));
-		profissionalEquipe.setProfissional(profissionalRepository.getReferenceById(dados.idProfissional()));
-		profissionalEquipeRepository.save(profissionalEquipe);
 		
+		Equipe equipe = equipeRepository.getReferenceById(dados.idEquipe());
+		Profissional profissional = profissionalRepository.getReferenceById(dados.idProfissional());
+		
+		if (equipe.getConstrutora()== profissional.getConstrutora()) {
+			profissionalEquipe.setEquipe(equipeRepository.getReferenceById(dados.idEquipe()));
+			profissionalEquipe.setProfissional(profissionalRepository.getReferenceById(dados.idProfissional()));
+			profissionalEquipeRepository.save(profissionalEquipe);
+		}else {
+			throw new DadosInvalidosException ("Este funcionário e equipe não pertencem a mesma construtora");
+		}
+
+
 		return profissionalEquipeRepository.findById(profissionalEquipe.getId()).map(DadosDetalhamentoProfissionalEquipe::new);
 		
 	}
@@ -61,8 +72,9 @@ public class ProfissionalEquipeService {
 	}
 
 	public Page<DadosDetalhamentoProfissionalEquipe> listar(Pageable paginacao) {
-		return profissionalEquipeRepository.findAll(paginacao).map(DadosDetalhamentoProfissionalEquipe::new);
+		return profissionalEquipeRepository.findByEquipeProfissionalStatusTrue(paginacao).map(DadosDetalhamentoProfissionalEquipe::new);
 	}
+	
 	
 	public void deletar(Long id) {
 		profissionalEquipeRepository.deleteById(id);

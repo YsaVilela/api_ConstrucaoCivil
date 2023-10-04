@@ -2,9 +2,11 @@ package br.com.magnasistemas.construcaocivil.dto.projeto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 public record DadosEndereco (
 		@NotBlank (message = "CEP não pode ser vazio")
+		@Pattern(regexp = "\\d{8}", message = "CEP inválido")
 		String cep,
 		
 		@NotBlank (message = "Logradouro não pode ser vazio")

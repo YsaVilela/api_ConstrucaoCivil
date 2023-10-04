@@ -17,20 +17,41 @@ public interface ProfissionalEquipeRepository extends JpaRepository<Profissional
 
 	@Query("select r from ProfissionalEquipe r where r.profissional.id = :idProfissional")
 	Page<ProfissionalEquipe> findByIdProfissional(Long idProfissional, Pageable paginacao);
-	
+
 	@Modifying
 	@Query("delete from ProfissionalEquipe r where r.equipe.id = :idEquipe")
 	void deleteByIdEquipe(Long idEquipe);
-	
+
 	@Modifying
 	@Query("""
 			delete from ProfissionalEquipe r
-			where r.profissional.id = :idProfissional 
+			where r.profissional.id = :idProfissional
 			""")
 	void deleteByIdProfissional(Long idProfissional);
-	
+
 	@Transactional
 	@Modifying
 	@Query(value = "DELETE FROM tb_profissional_equipe; ALTER SEQUENCE tb_profissional_equipe_id_seq RESTART WITH 1", nativeQuery = true)
 	void deleteAllAndResetSequence();
+
+	@Modifying
+	@Query("""
+			delete from ProfissionalEquipe r
+			where r.profissional.construtora.id = :idConstrutora
+			""")
+	void deleteByIdProfissionalConstrutora(Long idConstrutora);
+
+	@Modifying
+	@Query("""
+			delete from ProfissionalEquipe r
+			where r.equipe.construtora.id = :idConstrutora
+			""")
+	void deleteByIdEquipeConstrutora(Long idConstrutora);
+
+	@Query("""
+			select r from ProfissionalEquipe r
+			where r.profissional.status = true AND  r.equipe.status = true
+			""")
+	Page<ProfissionalEquipe> findByEquipeProfissionalStatusTrue(Pageable paginacao);
+
 }

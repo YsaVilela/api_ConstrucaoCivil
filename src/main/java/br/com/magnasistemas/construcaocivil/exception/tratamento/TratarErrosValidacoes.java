@@ -1,4 +1,4 @@
-package br.com.magnasistemas.construcaocivil.exception;
+package br.com.magnasistemas.construcaocivil.exception.tratamento;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-public class TratarErros {
+public class TratarErrosValidacoes {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<List<DadosErroValidacao>> tratarErro400(MethodArgumentNotValidException ex) {
         var erros = ex.getFieldErrors();
@@ -21,4 +21,5 @@ public class TratarErros {
             this(erro.getField(), erro.getDefaultMessage());
         } 
     }
+    
 }  

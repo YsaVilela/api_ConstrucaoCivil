@@ -28,8 +28,6 @@ import br.com.magnasistemas.construcaocivil.entity.dominio.Cidade;
 import br.com.magnasistemas.construcaocivil.entity.dominio.Estados;
 import br.com.magnasistemas.construcaocivil.repository.ConstrutoraRepository;
 import br.com.magnasistemas.construcaocivil.repository.EnderecoRepository;
-import br.com.magnasistemas.construcaocivil.repository.EquipeRepository;
-import br.com.magnasistemas.construcaocivil.repository.ProfissionalRepository;
 import br.com.magnasistemas.construcaocivil.repository.ProjetoRepository;
 import br.com.magnasistemas.construcaocivil.repository.dominio.CidadesRepository;
 import br.com.magnasistemas.construcaocivil.repository.dominio.EstadosRepository;
@@ -89,7 +87,7 @@ class ProjetoControllerTest {
 	}
 
 	@AfterEach
-	void finlizar(){
+	void finlizar() {
 		enderecoRepository.deleteAllAndResetSequence();
 		cidadeRepository.deleteAllAndResetSequence();
 		estadosRepository.deleteAll();
@@ -122,7 +120,8 @@ class ProjetoControllerTest {
 
 		assertTrue(response.getStatusCode().is5xxServerError());
 	}
-
+	
+	 
 	@Test
 	@DisplayName("Deve retornar codigo http 200 quando listar um projeto por id")
 	void listarProjetoPorId() {
@@ -184,7 +183,7 @@ class ProjetoControllerTest {
 	void deletarProjeto() {
 		iniciarProjeto();
 
-		ResponseEntity response = restTemplate.exchange("/projetos/deletar/1", HttpMethod.DELETE, null,
+		ResponseEntity<DadosDetalhamentoProjeto> response = restTemplate.exchange("/projetos/deletar/1", HttpMethod.DELETE, null,
 				DadosDetalhamentoProjeto.class);
 		assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
 	}

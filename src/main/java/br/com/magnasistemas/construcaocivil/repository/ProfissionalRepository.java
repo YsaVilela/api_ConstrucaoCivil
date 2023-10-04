@@ -19,4 +19,18 @@ public interface ProfissionalRepository extends JpaRepository<Profissional,Long>
 	@Query(value = "DELETE FROM tb_profissional; ALTER SEQUENCE tb_profissional_id_seq RESTART WITH 1", nativeQuery = true)
 	void deleteAllAndResetSequence();
 
+	@Modifying
+	@Query("""
+			delete from Profissional r
+			where r.construtora.id = :idConstrutora 
+			""")
+	void deleteByIdConstrutora(Long idConstrutora);
+
+	
+	@Query("""
+			select r from Profissional r
+			where r.construtora.id = :idConstrutora 
+			""")
+	Profissional findByIdConstrutora(Long idConstrutora);
+
 }

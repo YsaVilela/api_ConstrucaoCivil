@@ -30,13 +30,9 @@ import br.com.magnasistemas.construcaocivil.dto.construtora.DadosDetalhamentoCon
 import br.com.magnasistemas.construcaocivil.dto.profissional.DadosAtualizarProfissional;
 import br.com.magnasistemas.construcaocivil.dto.profissional.DadosDetalhamentoProfissional;
 import br.com.magnasistemas.construcaocivil.dto.profissional.DadosProfissional;
-import br.com.magnasistemas.construcaocivil.exception.TratarErros;
-import br.com.magnasistemas.construcaocivil.exception.TratarErros.DadosErroValidacao;
 import br.com.magnasistemas.construcaocivil.repository.CargoRepository;
 import br.com.magnasistemas.construcaocivil.repository.ConstrutoraRepository;
-import br.com.magnasistemas.construcaocivil.repository.EquipeRepository;
 import br.com.magnasistemas.construcaocivil.repository.ProfissionalRepository;
-import br.com.magnasistemas.construcaocivil.repository.ProjetoRepository;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -51,15 +47,9 @@ class ProfissionalControllerTest {
 
 	@Autowired
 	private ProfissionalRepository profissionalRepository;
-	
+
 	@Autowired
 	private CargoRepository cargoRepository;
-	
-	@Autowired
-	private EquipeRepository equipeRepository;
-	
-	@Autowired
-	private ProjetoRepository projetoRepository;
 
 	void iniciarConstrutora() {
 		DadosConstrutora dadosConstrutora = new DadosConstrutora("12345678901234", "Construtora Teste", "11912345678",
@@ -68,25 +58,24 @@ class ProfissionalControllerTest {
 	}
 
 	void iniciarCargo() {
-		DadosCargo dadosCargo = new DadosCargo("Cargo Teste", 123.45);
+		DadosCargo dadosCargo = new DadosCargo("Cargo Teste", 1500.45);
 		restTemplate.postForEntity("/cargo/cadastrar", dadosCargo, DadosDetalhamentoCargo.class);
 	}
-	
+
 	void iniciarProfissional() {
 		DadosProfissional dadosProfissional = new DadosProfissional(1L, "12345678901", "Profissional Teste ",
 				"11912345678", 1l);
 		restTemplate.postForEntity("/profissional/cadastrar", dadosProfissional, DadosDetalhamentoProfissional.class);
 	}
 
-	
 	@BeforeEach
-	void iniciar() {	
+	void iniciar() {
 		iniciarCargo();
 		iniciarConstrutora();
 	}
-	
+
 	@AfterEach
-	void finlizar(){
+	void finalizar() {
 		profissionalRepository.deleteAllAndResetSequence();
 		cargoRepository.deleteAllAndResetSequence();
 		construtoraRepository.deleteAllAndResetSequence();
@@ -115,13 +104,17 @@ class ProfissionalControllerTest {
 	}
 
 	private static Stream<Object[]> provideInvalidProfissionalData() {
-		return Stream.of(new Object[] { null, "12345678901", "ProfissionalTeste", "12345678901", 1L },
-				new Object[] { 1L, null, "ProfissionalTeste", "12345678901", 1L },
-				new Object[] { 1L, "12345678901", null, "12345678901", 1L },
+		return Stream.of(new Object[] { null, "12345678901", "ProfissionalTeste", "11987654321", 1L },
+				new Object[] { 1L, null, "ProfissionalTeste", "11987654321", 1L },
+				new Object[] { 1L, " ", "ProfissionalTeste", "11987654321", 1L },
+				new Object[] { 1L, "1234567890", "ProfissionalTeste", "11987654321", 1L },
+				new Object[] { 1L, "12345678901", null, "11987654321", 1L },
 				new Object[] { 1L, "12345678901", "ProfissionalTeste", null, 1L },
-				new Object[] { 1L, "12345678901", "ProfissionalTeste", "12345678901", null });
+				new Object[] { 1L, "12345678901", "ProfissionalTeste", "11987654321", null },
+				new Object[] { 1L, "12345678901", "ProfissionalTeste", " ", null },
+				new Object[] { 1L, "12345678901", "ProfissionalTeste", "1198765432", null });
 	}
-	
+
 	@Test
 	@DisplayName("Deve retornar erro quando criar profissional com cargo inválido")
 	void criarProfissionalComCargoInvalido() {
@@ -137,13 +130,12 @@ class ProfissionalControllerTest {
 	@DisplayName("deve devolver codigo http 200 quando listar um profissional por id")
 	void listarProfissionalPorId() {
 		iniciarProfissional();
-		
+
 		ResponseEntity<DadosDetalhamentoProfissional> response = restTemplate.getForEntity("/profissional/buscar/1",
 				DadosDetalhamentoProfissional.class);
 
 		assertTrue(response.getStatusCode().is2xxSuccessful());
 	}
-
 
 	@Test
 	@DisplayName("deve retornar um erro quando listar um profissional por um id inválido")
@@ -153,34 +145,56 @@ class ProfissionalControllerTest {
 
 		assertTrue(response.getStatusCode().is5xxServerError());
 	}
-	
 
 	@Test
-	@DisplayName("deve devolver codigo http 200 quando listar um profissional")
+	@DisplayName("Deve retornar um erro quando listar um profissional por id porem com construtora desativada")
+	void listarProfissionalPorIdInválidoConstrutora() {
+		iniciarProfissional();
+		restTemplate.exchange("/construtora/desativar/1", HttpMethod.DELETE, null, DadosDetalhamentoConstrutora.class);
+
+		ResponseEntity<DadosDetalhamentoProfissional> response = restTemplate.getForEntity("/profissional/buscar/1",
+				DadosDetalhamentoProfissional.class);
+
+		assertTrue(response.getStatusCode().is5xxServerError());
+	}
+
+	@Test
+	@DisplayName("Deve retornar codigo http 200 quando listar um profissional por id com construtora sendo reativada")
+	void listarProfissiopnalPorIdReativadoConstrutora() {
+		iniciarProfissional();
+		restTemplate.exchange("/construtora/desativar/1", HttpMethod.DELETE, null, DadosDetalhamentoConstrutora.class);
+		restTemplate.exchange("/construtora/ativar/1", HttpMethod.PUT, null, DadosDetalhamentoConstrutora.class);
+
+		ResponseEntity<DadosDetalhamentoProfissional> response = restTemplate.getForEntity("/profissional/buscar/1",
+				DadosDetalhamentoProfissional.class);
+
+		assertTrue(response.getStatusCode().is2xxSuccessful());
+	}
+
+	@Test
+	@DisplayName("Deve retornar codigo http 200 quando listar um profissional")
 	void listarProfissional() {
-		iniciarProfissional();		
+		iniciarProfissional();
 
 		ResponseEntity<DadosDetalhamentoProfissional> response = restTemplate.getForEntity("/profissional/listar/todos",
 				DadosDetalhamentoProfissional.class);
 
 		assertTrue(response.getStatusCode().is2xxSuccessful());
 	}
-	
 
 	@Test
-	@DisplayName("deve devolver codigo http 200 quando listar as profissionais ativos")
+	@DisplayName("Deve retornar codigo http 200 quando listar as profissionais ativos")
 	void listarProfissionaisAtivos() {
 		iniciarProfissional();
-		
+
 		ResponseEntity<DadosDetalhamentoProfissional> response = restTemplate.getForEntity("/profissional/listar",
 				DadosDetalhamentoProfissional.class);
 
 		assertTrue(response.getStatusCode().is2xxSuccessful());
 	}
-	
 
 	@Test
-	@DisplayName("deve devolver codigo http 200 quando atualizar uma Profissional")
+	@DisplayName("Deve retornar codigo http 200 quando atualizar uma Profissional")
 	void atualizarEquipe() {
 		iniciarProfissional();
 
@@ -192,7 +206,6 @@ class ProfissionalControllerTest {
 
 		assertTrue(response.getStatusCode().is2xxSuccessful());
 	}
-	
 
 	@Test
 	@DisplayName("deve retornar um erro quando atualizar com um id inválido")
@@ -206,49 +219,45 @@ class ProfissionalControllerTest {
 
 		assertTrue(response.getStatusCode().is5xxServerError());
 	}
-	
 
 	@Test
 	@DisplayName("deve retornar um 204 quando desativar uma profissional com um id válido")
 	void desativarProfissional() {
 		iniciarProfissional();
 
-		ResponseEntity response = restTemplate.exchange("/profissional/desativar/1", HttpMethod.DELETE, null,
-				DadosDetalhamentoProfissional.class);
+		ResponseEntity<DadosDetalhamentoProfissional> response = restTemplate.exchange("/profissional/desativar/1",
+				HttpMethod.DELETE, null, DadosDetalhamentoProfissional.class);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 	}
 
-	
 	@Test
 	@DisplayName("deve devolver codigo http 200 quando ativar um profissional")
 	void ativarEquipe() {
 		iniciarProfissional();
 
 		restTemplate.exchange("/equipe/desativar/1", HttpMethod.DELETE, null, DadosDetalhamentoProfissional.class);
-		ResponseEntity<DadosDetalhamentoProfissional> response = restTemplate.exchange("/profissional/ativar/1", HttpMethod.PUT,
-				null, DadosDetalhamentoProfissional.class);
+		ResponseEntity<DadosDetalhamentoProfissional> response = restTemplate.exchange("/profissional/ativar/1",
+				HttpMethod.PUT, null, DadosDetalhamentoProfissional.class);
 
 		assertTrue(response.getStatusCode().is2xxSuccessful());
 	}
 
-	
 	@Test
 	@DisplayName("deve devolver um erro quando ativar um profissional com um id inválido")
 	void ativarEquipeIdInvalido() {
-		ResponseEntity<DadosDetalhamentoProfissional> response = restTemplate.exchange("/profissional/ativar/1", HttpMethod.PUT,
-				null, DadosDetalhamentoProfissional.class);
+		ResponseEntity<DadosDetalhamentoProfissional> response = restTemplate.exchange("/profissional/ativar/1",
+				HttpMethod.PUT, null, DadosDetalhamentoProfissional.class);
 
 		assertTrue(response.getStatusCode().is5xxServerError());
 	}
 
-	
 	@Test
 	@DisplayName("deve retornar um 204 quando deletar com um id válido")
 	void deletarProfissional() {
 		iniciarProfissional();
 
-		ResponseEntity response = restTemplate.exchange("/profissional/deletar/1", HttpMethod.DELETE, null,
-				DadosDetalhamentoProfissional.class);
+		ResponseEntity<DadosDetalhamentoProfissional> response = restTemplate.exchange("/profissional/deletar/1",
+				HttpMethod.DELETE, null, DadosDetalhamentoProfissional.class);
 		assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
 	}
 

@@ -24,6 +24,15 @@ public class ConstrutoraService {
 	private ConstrutoraRepository construtoraRepository;
 	
 	@Autowired
+	private ProfissionalService profissionalService;
+	
+	@Autowired
+	private EquipeService equipeService;
+	
+	@Autowired
+	private ProjetoService projetoService;
+	
+	@Autowired
 	private List<ValidadorConstrutora> validadoresConstrutora;
 
 	
@@ -62,6 +71,17 @@ public class ConstrutoraService {
 		construtoraRepository.save(construtora);
 		return new DadosDetalhamentoConstrutora(construtora);
 	}
+
+	public DadosDetalhamentoConstrutora desativar(Long id) {
+		validadoresConstrutora.forEach(v -> v.validar(id));
+		Construtora construtora = construtoraRepository.getReferenceById(id);
+			construtora.setStatus(false);
+		construtoraRepository.save(construtora);
+		
+		profissionalService.construtoraDesativada(id);
+		equipeService.construtoraDesativada(id); 
+		return new DadosDetalhamentoConstrutora(construtora);
+	}
 	
 	public DadosDetalhamentoConstrutora ativar(Long id) {
 		Optional<Construtora> validarConstrutora = construtoraRepository.findById(id);
@@ -71,19 +91,16 @@ public class ConstrutoraService {
 		Construtora construtora = construtoraRepository.getReferenceById(id);
 			construtora.setStatus(true);
 		construtoraRepository.save(construtora);
-		return new DadosDetalhamentoConstrutora(construtora);
-	}
-
-	public DadosDetalhamentoConstrutora desativar(Long id) {
-		validadoresConstrutora.forEach(v -> v.validar(id));
-
-		Construtora construtora = construtoraRepository.getReferenceById(id);
-			construtora.setStatus(false);
-		construtoraRepository.save(construtora);
+		
+		profissionalService.construtoraAtivada(id);
+		equipeService.construtoraAtivada(id);
 		return new DadosDetalhamentoConstrutora(construtora);
 	}
 
 	public void deletar(Long id) {
+		profissionalService.deleteByIdConstrutora(id);
+		equipeService.deleteByIdConstrutora(id);
+		projetoService.deleteByIdConstrutora(id);
 		construtoraRepository.deleteById(id);		
 	}
 

@@ -3,9 +3,14 @@ package br.com.magnasistemas.construcaocivil.controller;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.jupiter.api.BeforeEach;
+import java.util.List;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,25 +39,62 @@ class CargoControllerTest {
 	private CargoRepository cargoRepository;
 
 	void iniciarCargo() {
-		DadosCargo dadosCargo = new DadosCargo("Cargo Teste", 123.45);
+		DadosCargo dadosCargo = new DadosCargo("Cargo Teste", 1500.45);
 		restTemplate.postForEntity("/cargo/cadastrar", dadosCargo, DadosDetalhamentoCargo.class);
 	}
 
-	@BeforeEach
-	void iniciar() {
+	@AfterEach
+	void finlizar() {
 		cargoRepository.deleteAllAndResetSequence();
 	}
 
 	@Test
 	@DisplayName("Deve retornar um created quando criado com sucesso")
 	void criarCargo() {
-		DadosCargo dadosCargo = new DadosCargo("Cargo Teste", 123.45);
+		DadosCargo dadosCargo = new DadosCargo("Cargo Teste", 1500.45);
 
 		ResponseEntity<DadosDetalhamentoCargo> response = restTemplate.postForEntity("/cargo/cadastrar", dadosCargo,
 				DadosDetalhamentoCargo.class);
 
 		assertEquals(HttpStatus.CREATED, response.getStatusCode());
+	}
 
+	@ParameterizedTest
+	@MethodSource("provideInvalidCargoData")
+	@DisplayName("Deve retornar erro quando algum campo é nulo")
+	void criarCargoComCamposNulos(String nome, Double remuneracao) {
+		DadosCargo dadosCargo = new DadosCargo(nome, remuneracao);
+		ResponseEntity response = restTemplate.postForEntity("/cargo/cadastrar", dadosCargo, List.class);
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+	}
+
+	private static Stream<Object[]> provideInvalidCargoData() {
+		return Stream.of(new Object[] { null, 1600.00 }, 
+				new Object[] { " ", 1600.00 }, 
+				new Object[] { "Cargo", null });
+	}
+
+	@Test
+	@DisplayName("Deve retornar erro quando criar dois cargos com o mesmo nome")
+	void criarCargoNomeRepetido() {
+		iniciarCargo();
+		DadosCargo dadosCargo = new DadosCargo("Cargo Teste", 1500.45);
+
+		ResponseEntity<DadosDetalhamentoCargo> response = restTemplate.postForEntity("/cargo/cadastrar", dadosCargo,
+				DadosDetalhamentoCargo.class);
+
+		assertTrue(response.getStatusCode().is5xxServerError());
+	}
+	 
+	@Test
+	@DisplayName("Deve devolver codigo http 200 quando buscar um cargo por id")
+	void criarRemuneracaoInvalida() {
+		DadosCargo dadosCargo = new DadosCargo("Cargo Teste", 150.00);
+
+		ResponseEntity<DadosDetalhamentoCargo> response = restTemplate.postForEntity("/cargo/cadastrar", dadosCargo,
+				DadosDetalhamentoCargo.class);
+
+		assertTrue(response.getStatusCode().is5xxServerError());
 	}
 
 	@Test
@@ -89,7 +131,7 @@ class CargoControllerTest {
 	void atualizarCargo() {
 		iniciarCargo();
 
-		DadosAtualizarCargo dadosAtualizarCargo = new DadosAtualizarCargo(1L, "Cargo Atualizar", 543.21);
+		DadosAtualizarCargo dadosAtualizarCargo = new DadosAtualizarCargo(1L, "Cargo Atualizar", 1600.21);
 
 		ResponseEntity<DadosDetalhamentoCargo> response = restTemplate.exchange("/cargo/atualizar", HttpMethod.PUT,
 				new HttpEntity<>(dadosAtualizarCargo), DadosDetalhamentoCargo.class);
@@ -100,7 +142,19 @@ class CargoControllerTest {
 	@Test
 	@DisplayName("Deve retornar um erro quando atualizar com um id inválido")
 	void atualizarCargoInvalido() {
-		DadosAtualizarCargo dadosAtualizarCargo = new DadosAtualizarCargo(1L, "Cargo Atualizar", 543.21);
+		DadosAtualizarCargo dadosAtualizarCargo = new DadosAtualizarCargo(1L, "Cargo Atualizar", 1600.21);
+
+		ResponseEntity<DadosDetalhamentoCargo> response = restTemplate.exchange("/cargo/atualizar", HttpMethod.PUT,
+				new HttpEntity<>(dadosAtualizarCargo), DadosDetalhamentoCargo.class);
+
+		assertTrue(response.getStatusCode().is5xxServerError());
+	}
+	
+	@Test
+	@DisplayName("Deve devolver codigo http 200 quando atualizar um cargo com remuneracao reduzida")
+	void atualizarCargoComRemunacaoMenor() {
+		iniciarCargo();
+		DadosAtualizarCargo dadosAtualizarCargo = new DadosAtualizarCargo(1L, "Cargo Atualizar", 1400.21);
 
 		ResponseEntity<DadosDetalhamentoCargo> response = restTemplate.exchange("/cargo/atualizar", HttpMethod.PUT,
 				new HttpEntity<>(dadosAtualizarCargo), DadosDetalhamentoCargo.class);
@@ -113,8 +167,8 @@ class CargoControllerTest {
 	void deletaCargo() {
 		iniciarCargo();
 
-		ResponseEntity response = restTemplate.exchange("/cargo/deletar/1", HttpMethod.DELETE, null,
-				DadosDetalhamentoCargo.class);
+		ResponseEntity<DadosDetalhamentoCargo> response = restTemplate.exchange("/cargo/deletar/1", HttpMethod.DELETE,
+				null, DadosDetalhamentoCargo.class);
 		assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
 	}
 
