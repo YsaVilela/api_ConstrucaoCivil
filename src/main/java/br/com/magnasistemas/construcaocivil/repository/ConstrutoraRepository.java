@@ -17,4 +17,24 @@ public interface ConstrutoraRepository extends JpaRepository<Construtora,Long> {
 	@Modifying
 	@Query(value = "DELETE FROM tb_construtora; ALTER SEQUENCE tb_construtora_id_seq RESTART WITH 1", nativeQuery = true)
 	void deleteAllAndResetSequence();
+
+	@Query("""
+			select r from Construtora r
+			where r.cnpj = :cnpj 
+			""")
+	Construtora findByCpf(String cnpj);
+
+	@Query("""
+			select r from Construtora r
+			where r.telefone = :telefone 
+			""")
+	Construtora findByTelefone(String telefone);
+
+	@Query("""
+			select r from Construtora r
+			where r.email = :email 
+			""")
+	Construtora findByEmail(String email);
+	
+	
 }

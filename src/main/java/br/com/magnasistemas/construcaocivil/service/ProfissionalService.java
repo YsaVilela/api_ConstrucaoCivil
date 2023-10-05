@@ -13,6 +13,7 @@ import br.com.magnasistemas.construcaocivil.dto.profissional.DadosDetalhamentoPr
 import br.com.magnasistemas.construcaocivil.dto.profissional.DadosProfissional;
 import br.com.magnasistemas.construcaocivil.entity.Profissional;
 import br.com.magnasistemas.construcaocivil.exception.BuscarException;
+import br.com.magnasistemas.construcaocivil.exception.CustomDataIntegrityException;
 import br.com.magnasistemas.construcaocivil.repository.CargoRepository;
 import br.com.magnasistemas.construcaocivil.repository.ConstrutoraRepository;
 import br.com.magnasistemas.construcaocivil.repository.ProfissionalEquipeRepository;
@@ -45,12 +46,20 @@ public class ProfissionalService {
 
 	@Autowired
 	private List<ValidadorProfissional> validadoresProfissional;
+	
+	void validacao(String cpf, String telefone) {
+		if (profissionalRepository.findByCpf(cpf) != null)
+			throw new CustomDataIntegrityException("Duplicação de valor da chave cpf viola a restrição de unicidade.");
+		if (profissionalRepository.findByTelefone(telefone)!= null)
+			throw new CustomDataIntegrityException("Duplicação de valor da chave telefone viola a restrição de unicidade.");
+	}
 
 	public Optional<DadosDetalhamentoProfissional> criarProfissional(DadosProfissional dados) {
 		Profissional profissional = new Profissional();
 
 		validadoresConstrutora.forEach(v -> v.validar(dados.idConstrutora()));
 		validadoresCargo.forEach(v -> v.validar(dados.idCargo()));
+		validacao(dados.cpf(), dados.telefone());
 
 		profissional.setConstrutora(construtoraRepository.getReferenceById(dados.idConstrutora()));
 		profissional.setCpf(dados.cpf());
@@ -81,6 +90,7 @@ public class ProfissionalService {
 		validadoresProfissional.forEach(v -> v.validar(dados.id()));
 		validadoresCargo.forEach(v -> v.validar(dados.idCargo()));
 		validadoresConstrutora.forEach(v -> v.validar(dados.idConstrutora()));
+		validacao(dados.cpf(), dados.telefone());
 
 		Profissional profissional = profissionalRepository.getReferenceById(dados.id());
 		profissional.setConstrutora(construtoraRepository.getReferenceById(dados.id()));

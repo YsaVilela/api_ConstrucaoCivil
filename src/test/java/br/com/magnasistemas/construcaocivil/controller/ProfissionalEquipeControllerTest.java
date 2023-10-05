@@ -30,6 +30,7 @@ import br.com.magnasistemas.construcaocivil.dto.profissional.DadosProfissional;
 import br.com.magnasistemas.construcaocivil.dto.profissional_equipe.DadosDetalhamentoProfissionalEquipe;
 import br.com.magnasistemas.construcaocivil.dto.profissional_equipe.DadosProfissionalEquipe;
 import br.com.magnasistemas.construcaocivil.enumerator.Turno;
+import br.com.magnasistemas.construcaocivil.repository.CargoRepository;
 import br.com.magnasistemas.construcaocivil.repository.ConstrutoraRepository;
 import br.com.magnasistemas.construcaocivil.repository.EquipeRepository;
 import br.com.magnasistemas.construcaocivil.repository.ProfissionalEquipeRepository;
@@ -54,6 +55,9 @@ class ProfissionalEquipeControllerTest {
 
 	@Autowired
 	private EquipeRepository equipeRepository;
+
+	@Autowired
+	private CargoRepository cargoRepository;
 
 	void iniciarConstrutora() {
 		DadosConstrutora dadosConstrutora = new DadosConstrutora("12345678901234", "Construtora Teste", "11912345678",
@@ -97,6 +101,7 @@ class ProfissionalEquipeControllerTest {
 		equipeRepository.deleteAllAndResetSequence();
 		profissionalRepository.deleteAllAndResetSequence();
 		construtoraRepository.deleteAllAndResetSequence();
+		cargoRepository.deleteAllAndResetSequence();
 	}
 
 	@Test
@@ -156,7 +161,19 @@ class ProfissionalEquipeControllerTest {
 				dadosProfissionalEquipe, JsonNode.class);
 
 		assertTrue(response.getStatusCode().is4xxClientError());
+	}
+	
+	@Test
+	@DisplayName("Deve retornar um erro quando o profissional já estiver inserido na equipe")
+	void criarProfissionalEquipeJaExiste() {
+		iniciarProfissionalEquipe();
 
+		DadosProfissionalEquipe dadosProfissionalEquipe = new DadosProfissionalEquipe(1L, 1L);
+
+		ResponseEntity<JsonNode> response = restTemplate.postForEntity("/profissional/equipe/cadastrar",
+				dadosProfissionalEquipe, JsonNode.class);
+
+		assertTrue(response.getStatusCode().is4xxClientError());
 	}
 
 	@Test

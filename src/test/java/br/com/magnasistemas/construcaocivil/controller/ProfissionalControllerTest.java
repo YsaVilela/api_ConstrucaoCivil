@@ -131,6 +131,35 @@ class ProfissionalControllerTest {
 	}
 
 	@Test
+	@DisplayName("Deve retornar erro quando criar profissional com cpf repetido")
+	void criarProfissionalComCpfRepetido() {
+		iniciarProfissional();
+
+		DadosProfissional dadosProfissional = new DadosProfissional(1L, "12345678901", "Profissional Teste ",
+				"11912345678", 1l);
+
+		ResponseEntity<JsonNode> response = restTemplate.postForEntity("/profissional/cadastrar", dadosProfissional,
+				JsonNode.class);
+
+		assertTrue(response.getStatusCode().is4xxClientError());
+	}
+	
+	@Test
+	@DisplayName("Deve retornar erro quando criar profissional com telefone repetido")
+	void criarProfissionalComTelefoneRepetido() {
+		iniciarProfissional();
+
+		DadosProfissional dadosProfissional = new DadosProfissional(1L, "12345678900", "Profissional Teste ",
+				"11912345678", 1l);
+
+		ResponseEntity<JsonNode> response = restTemplate.postForEntity("/profissional/cadastrar", dadosProfissional,
+				JsonNode.class);
+
+		assertTrue(response.getStatusCode().is4xxClientError());
+	}
+	
+
+	@Test
 	@DisplayName("deve devolver codigo http 200 quando listar um profissional por id")
 	void listarProfissionalPorId() {
 		iniciarProfissional();
@@ -155,7 +184,7 @@ class ProfissionalControllerTest {
 	void listarProfissionalPorIdInválidoConstrutora() {
 		iniciarProfissional();
 		restTemplate.exchange("/construtora/desativar/1", HttpMethod.DELETE, null, DadosDetalhamentoConstrutora.class);
-		
+
 		ResponseEntity<JsonNode> response = restTemplate.getForEntity("/profissional/buscar/1", JsonNode.class);
 
 		assertTrue(response.getStatusCode().is4xxClientError());
@@ -232,18 +261,18 @@ class ProfissionalControllerTest {
 				HttpMethod.DELETE, null, DadosDetalhamentoProfissional.class);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 	}
-	
+
 	@Test
 	@DisplayName("Deve retornar código http 200 quando ativar um profissional")
 	void ativarProfissional() {
 		iniciarProfissional();
-		restTemplate.exchange("/profissional/desativar/1", HttpMethod.DELETE, null, DadosDetalhamentoProfissional.class);
-		ResponseEntity<DadosDetalhamentoProfissional> response = restTemplate.exchange("/profissional/ativar/1", HttpMethod.PUT,
-				null, DadosDetalhamentoProfissional.class);
+		restTemplate.exchange("/profissional/desativar/1", HttpMethod.DELETE, null,
+				DadosDetalhamentoProfissional.class);
+		ResponseEntity<DadosDetalhamentoProfissional> response = restTemplate.exchange("/profissional/ativar/1",
+				HttpMethod.PUT, null, DadosDetalhamentoProfissional.class);
 
 		assertTrue(response.getStatusCode().is2xxSuccessful());
 	}
-	
 
 	@Test
 	@DisplayName("deve devolver um erro quando ativar um profissional com um id inválido")

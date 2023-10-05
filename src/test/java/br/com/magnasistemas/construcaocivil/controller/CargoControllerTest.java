@@ -80,17 +80,16 @@ class CargoControllerTest {
 		iniciarCargo();
 		DadosCargo dadosCargo = new DadosCargo("Cargo Teste", 1500.45);
 
-		ResponseEntity<DadosDetalhamentoCargo> response = restTemplate.postForEntity("/cargo/cadastrar", dadosCargo,
-				DadosDetalhamentoCargo.class);
+		ResponseEntity<JsonNode> response = restTemplate.postForEntity("/cargo/cadastrar", dadosCargo, JsonNode.class);
 
-		assertTrue(response.getStatusCode().is5xxServerError());
+		assertTrue(response.getStatusCode().is4xxClientError());
 	}
 
 	@Test
 	@DisplayName("Deve devolver codigo http 400 quando criar um cargo com o slario abaixo do minimo")
 	void criarRemuneracaoInvalida() {
 		DadosCargo dadosCargo = new DadosCargo("Cargo Teste", 150.00);
-	
+
 		ResponseEntity<JsonNode> response = restTemplate.postForEntity("/cargo/cadastrar", dadosCargo, JsonNode.class);
 
 		assertTrue(response.getStatusCode().is4xxClientError());
@@ -136,6 +135,22 @@ class CargoControllerTest {
 				new HttpEntity<>(dadosAtualizarCargo), DadosDetalhamentoCargo.class);
 
 		assertTrue(response.getStatusCode().is2xxSuccessful());
+	}
+	
+	@Test
+	@DisplayName("Deve devolver erro quando atualizar um cargo para um que ja possua o mesmo nome")
+	void atualizarCargoComNomeInvalido() { 
+		iniciarCargo();
+		
+		DadosCargo dadosCargo = new DadosCargo("Cargo", 1500.45);
+		restTemplate.postForEntity("/cargo/cadastrar", dadosCargo, DadosDetalhamentoCargo.class);
+
+		DadosAtualizarCargo dadosAtualizarCargo = new DadosAtualizarCargo(2L, "Cargo Teste", 1600.21);
+
+		ResponseEntity<JsonNode> response = restTemplate.exchange("/cargo/atualizar", HttpMethod.PUT,
+				new HttpEntity<>(dadosAtualizarCargo), JsonNode.class);
+
+		assertTrue(response.getStatusCode().is4xxClientError());
 	}
 
 	@Test

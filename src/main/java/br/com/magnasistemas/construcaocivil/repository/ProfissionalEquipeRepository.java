@@ -1,6 +1,5 @@
 package br.com.magnasistemas.construcaocivil.repository;
 
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -53,5 +52,11 @@ public interface ProfissionalEquipeRepository extends JpaRepository<Profissional
 			where r.profissional.status = true AND  r.equipe.status = true
 			""")
 	Page<ProfissionalEquipe> findByEquipeProfissionalStatusTrue(Pageable paginacao);
+
+	@Query("""
+			select r from ProfissionalEquipe r
+			where r.profissional.id = :idProfissional AND  r.equipe.id = :idEquipe
+			""")
+	ProfissionalEquipe findByExistente(Long idProfissional, Long idEquipe);
 
 }

@@ -13,6 +13,7 @@ import br.com.magnasistemas.construcaocivil.dto.profissional_equipe.DadosProfiss
 import br.com.magnasistemas.construcaocivil.entity.Equipe;
 import br.com.magnasistemas.construcaocivil.entity.Profissional;
 import br.com.magnasistemas.construcaocivil.entity.ProfissionalEquipe;
+import br.com.magnasistemas.construcaocivil.exception.CustomDataIntegrityException;
 import br.com.magnasistemas.construcaocivil.exception.DadosInvalidosException;
 import br.com.magnasistemas.construcaocivil.repository.EquipeRepository;
 import br.com.magnasistemas.construcaocivil.repository.ProfissionalEquipeRepository;
@@ -38,12 +39,14 @@ public class ProfissionalEquipeService {
 	@Autowired
 	private List<ValidadorEquipe> validadoresEquipe;
 	
-
+	
 	public Optional<DadosDetalhamentoProfissionalEquipe> criarProfissioanlEquipe(DadosProfissionalEquipe dados) {
 		ProfissionalEquipe profissionalEquipe = new ProfissionalEquipe();
 
 		validadoresEquipe.forEach(v -> v.validar(dados.idEquipe()));
 		validadoresProfissional.forEach(v -> v.validar(dados.idProfissional()));	
+		if (profissionalEquipeRepository.findByExistente(dados.idProfissional(),dados.idEquipe())!= null)
+				throw new CustomDataIntegrityException("Esse funcionário já está inserido nesta equipe");
 		
 		Equipe equipe = equipeRepository.getReferenceById(dados.idEquipe());
 		Profissional profissional = profissionalRepository.getReferenceById(dados.idProfissional());

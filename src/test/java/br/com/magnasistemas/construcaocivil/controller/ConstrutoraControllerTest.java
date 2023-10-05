@@ -2,7 +2,6 @@ package br.com.magnasistemas.construcaocivil.controller;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -59,6 +58,42 @@ class ConstrutoraControllerTest {
 				dadosConstrutora, DadosDetalhamentoConstrutora.class);
 
 		assertEquals(HttpStatus.CREATED, response.getStatusCode());
+	}
+
+	@Test
+	@DisplayName("Deve retornar erro quando o cnjp já existe")
+	void criarConstrutoraComCnpjRepetido() {
+		iniciarConstrutora();
+		DadosConstrutora dadosConstrutora = new DadosConstrutora("12345678901234", "Construtora Teste", "11912345678",
+				"teste@hotmail.com");
+		ResponseEntity<JsonNode> response = restTemplate.postForEntity("/construtora/cadastrar", dadosConstrutora,
+				JsonNode.class);
+
+		assertTrue(response.getStatusCode().is4xxClientError());
+	}
+
+	@Test
+	@DisplayName("Deve retornar erro quando o telefone já existe")
+	void criarConstrutoraComTelefoneRepetido() {
+		iniciarConstrutora();
+		DadosConstrutora dadosConstrutora = new DadosConstrutora("12345678901230", "Construtora Teste", "11912345678",
+				"teste@hotmail.com");
+		ResponseEntity<JsonNode> response = restTemplate.postForEntity("/construtora/cadastrar", dadosConstrutora,
+				JsonNode.class);
+
+		assertTrue(response.getStatusCode().is4xxClientError());
+	}
+
+	@Test
+	@DisplayName("Deve retornar erro quando o email já existe")
+	void criarConstrutoraComEmailRepetido() {
+		iniciarConstrutora();
+		DadosConstrutora dadosConstrutora = new DadosConstrutora("12345678901230", "Construtora Teste", "11912345670",
+				"teste@hotmail.com");
+		ResponseEntity<JsonNode> response = restTemplate.postForEntity("/construtora/cadastrar", dadosConstrutora,
+				JsonNode.class);
+
+		assertTrue(response.getStatusCode().is4xxClientError());
 	}
 
 	@ParameterizedTest
@@ -132,7 +167,7 @@ class ConstrutoraControllerTest {
 	void atualizarEConstrutora() {
 		iniciarConstrutora();
 
-		DadosAtualizarConstrutora dadosAtualizarConstrutora = new DadosAtualizarConstrutora(1L,
+		DadosAtualizarConstrutora dadosAtualizarConstrutora = new DadosAtualizarConstrutora(1L, "12345678901230",
 				"Construtora atualizada", "11987654321", "testaAtualiza@gmail.com");
 		ResponseEntity<DadosAtualizarConstrutora> response = restTemplate.exchange("/construtora/atualizar",
 				HttpMethod.PUT, new HttpEntity<>(dadosAtualizarConstrutora), DadosAtualizarConstrutora.class);
@@ -146,7 +181,7 @@ class ConstrutoraControllerTest {
 	@DisplayName("deve devolver um erro quando atualizar com um id inválido")
 	void atualizarConstrutoraInvalido() {
 
-		DadosAtualizarConstrutora dadosAtualizarConstrutora = new DadosAtualizarConstrutora(1L,
+		DadosAtualizarConstrutora dadosAtualizarConstrutora = new DadosAtualizarConstrutora(1L, "12345678901234",
 				"Construtora atualizada", "11987654321", "testaAtualiza@gmail.com");
 
 		ResponseEntity<JsonNode> response = restTemplate.getForEntity("/construtora/atualizar/1", JsonNode.class);

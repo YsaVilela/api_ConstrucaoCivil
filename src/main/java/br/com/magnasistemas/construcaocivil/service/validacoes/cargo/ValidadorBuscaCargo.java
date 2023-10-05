@@ -10,7 +10,7 @@ import br.com.magnasistemas.construcaocivil.exception.BuscarException;
 import br.com.magnasistemas.construcaocivil.repository.CargoRepository;
 
 @Component
-public class ExisteCargo implements ValidadorCargo{
+public class ValidadorBuscaCargo implements ValidadorCargo{
 	
 	@Autowired
 	private CargoRepository cargoRepository;

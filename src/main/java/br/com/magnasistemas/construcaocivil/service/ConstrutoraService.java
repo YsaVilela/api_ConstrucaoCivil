@@ -13,6 +13,7 @@ import br.com.magnasistemas.construcaocivil.dto.construtora.DadosConstrutora;
 import br.com.magnasistemas.construcaocivil.dto.construtora.DadosDetalhamentoConstrutora;
 import br.com.magnasistemas.construcaocivil.entity.Construtora;
 import br.com.magnasistemas.construcaocivil.exception.BuscarException;
+import br.com.magnasistemas.construcaocivil.exception.CustomDataIntegrityException;
 import br.com.magnasistemas.construcaocivil.repository.ConstrutoraRepository;
 import br.com.magnasistemas.construcaocivil.service.validacoes.construtora.ValidadorConstrutora;
 import jakarta.validation.Valid;
@@ -35,9 +36,19 @@ public class ConstrutoraService {
 	@Autowired
 	private List<ValidadorConstrutora> validadoresConstrutora;
 
+	void validacao(String cnpj, String telefone, String email) {
+		if (construtoraRepository.findByCpf(cnpj) != null)
+			throw new CustomDataIntegrityException("Duplicação de valor da chave cpf viola a restrição de unicidade.");
+		if (construtoraRepository.findByTelefone(telefone)!= null)
+			throw new CustomDataIntegrityException("Duplicação de valor da chave telefone viola a restrição de unicidade.");
+		if (construtoraRepository.findByEmail(email)!= null)
+			throw new CustomDataIntegrityException("Duplicação de valor da chave telefone viola a restrição de unicidade.");
+	}
 	
 	public Optional<DadosDetalhamentoConstrutora> criarConstrutora(DadosConstrutora dados) {
-		Construtora construtora = new Construtora();
+		validacao(dados.cnpj(),dados.telefone(),dados.email());
+
+		Construtora construtora = new Construtora();			
 		construtora.setCnpj(dados.cnpj());
 		construtora.setNome(dados.nome());
 		construtora.setTelefone(dados.telefone());
@@ -63,6 +74,7 @@ public class ConstrutoraService {
 
 	public DadosDetalhamentoConstrutora atualizar(@Valid DadosAtualizarConstrutora dados) {
 		validadoresConstrutora.forEach(v -> v.validar(dados.id()));
+		validacao(dados.cnpj(),dados.telefone(),dados.email());
 		
 		Construtora construtora = construtoraRepository.getReferenceById(dados.id());
 				construtora.setNome(dados.nome()); 

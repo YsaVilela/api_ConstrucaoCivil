@@ -19,7 +19,7 @@ public class TratarErrosBuscaException {
 
     public record DadosErroBusca(String mensagem) {
         public DadosErroBusca(FieldError erro) {
-            this(erro.getDefaultMessage());
+            this(erro.getDefaultMessage()); 
         }
     }
 }

@@ -9,6 +9,10 @@ public record DadosAtualizarConstrutora(
 		@NotNull (message = "Campo Id é obrigatótio")
 		Long id,
 		
+		@NotBlank (message = "CPF é obrigatório")
+		@Pattern(regexp = "\\d{14}", message = "Telefone inválido")
+		String cnpj,
+		
 		@NotBlank (message = "Nome não pode estar vazio")
 		String nome,
 		

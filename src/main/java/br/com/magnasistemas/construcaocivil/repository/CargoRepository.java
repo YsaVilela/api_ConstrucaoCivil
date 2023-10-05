@@ -14,4 +14,10 @@ public interface CargoRepository extends JpaRepository<Cargo,Long>{
 	@Query(value = "DELETE FROM tb_cargo; ALTER SEQUENCE tb_cargo_id_seq RESTART WITH 1", nativeQuery = true)
 	void deleteAllAndResetSequence();
 
+	@Query("""
+			select r from Cargo r
+			where r.nome = :nome 
+			""")
+	Cargo findByNome(String nome);
+
 }

@@ -33,4 +33,16 @@ public interface ProfissionalRepository extends JpaRepository<Profissional,Long>
 			""")
 	Profissional findByIdConstrutora(Long idConstrutora);
 
+	@Query("""
+			select r from Profissional r
+			where r.cpf = :cpf 
+			""")
+	Profissional findByCpf(String cpf);
+
+	@Query("""
+			select r from Profissional r
+			where r.telefone = :telefone 
+			""")
+	Profissional findByTelefone(String telefone);
+
 }
