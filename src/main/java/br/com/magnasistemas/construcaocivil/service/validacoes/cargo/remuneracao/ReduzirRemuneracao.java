@@ -3,7 +3,7 @@ package br.com.magnasistemas.construcaocivil.service.validacoes.cargo.remuneraca
 import org.springframework.stereotype.Component;
 
 import br.com.magnasistemas.construcaocivil.entity.Cargo;
-import br.com.magnasistemas.construcaocivil.exception.DadosInvalidosException;
+import br.com.magnasistemas.construcaocivil.exception.InvalidDataException;
 
 @Component
 public class ReduzirRemuneracao implements ValidadorRemuneracaoCargo  {
@@ -13,7 +13,7 @@ public class ReduzirRemuneracao implements ValidadorRemuneracaoCargo  {
 		if (cargo.getRemuneracao() == null)
 			cargo.setRemuneracao(0.0);
 		if (cargo.getRemuneracao() > remuneracao)
-			throw new DadosInvalidosException("O salário não pode ser reduzido");		
+			throw new InvalidDataException("O salário não pode ser reduzido");		
 	}
 
 }

@@ -14,7 +14,7 @@ import br.com.magnasistemas.construcaocivil.entity.Equipe;
 import br.com.magnasistemas.construcaocivil.entity.Profissional;
 import br.com.magnasistemas.construcaocivil.entity.ProfissionalEquipe;
 import br.com.magnasistemas.construcaocivil.exception.CustomDataIntegrityException;
-import br.com.magnasistemas.construcaocivil.exception.DadosInvalidosException;
+import br.com.magnasistemas.construcaocivil.exception.InvalidDataException;
 import br.com.magnasistemas.construcaocivil.repository.EquipeRepository;
 import br.com.magnasistemas.construcaocivil.repository.ProfissionalEquipeRepository;
 import br.com.magnasistemas.construcaocivil.repository.ProfissionalRepository;
@@ -56,7 +56,7 @@ public class ProfissionalEquipeService {
 			profissionalEquipe.setProfissional(profissionalRepository.getReferenceById(dados.idProfissional()));
 			profissionalEquipeRepository.save(profissionalEquipe);
 		}else {
-			throw new DadosInvalidosException ("Este funcionário e equipe não pertencem a mesma construtora");
+			throw new InvalidDataException ("Este funcionário e equipe não pertencem a mesma construtora");
 		}
 
 

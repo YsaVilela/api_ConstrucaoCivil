@@ -14,7 +14,7 @@ import br.com.magnasistemas.construcaocivil.dto.projeto.DadosProjeto;
 import br.com.magnasistemas.construcaocivil.entity.Endereco;
 import br.com.magnasistemas.construcaocivil.entity.Projeto;
 import br.com.magnasistemas.construcaocivil.entity.dominio.Cidade;
-import br.com.magnasistemas.construcaocivil.exception.BuscarException;
+import br.com.magnasistemas.construcaocivil.exception.InvalidContentException;
 import br.com.magnasistemas.construcaocivil.repository.ConstrutoraRepository;
 import br.com.magnasistemas.construcaocivil.repository.ProjetoRepository;
 import br.com.magnasistemas.construcaocivil.repository.EnderecoRepository;
@@ -61,7 +61,7 @@ public class ProjetoService {
 		
 		Optional<Cidade> validarCidade = cidadeRepository.findById(dados.endereco().idCidade());
 		if (validarCidade.isEmpty()) 
-			throw new BuscarException ("Cidade não encontrada");
+			throw new InvalidContentException ("Cidade não encontrada");
 		endereco.setCidade(cidadeRepository.getReferenceById(dados.endereco().idCidade()));	
 		
 		endereco.setProjeto(projetoRepository.getReferenceById(projeto.getId()));
@@ -74,7 +74,7 @@ public class ProjetoService {
 	public Optional<DadosDetalhamentoProjeto> buscarPorId(Long id) {
 		Optional<Projeto> validarProjeto = projetoRepository.findById(id);
 		if (validarProjeto.isEmpty()) 
-			throw new BuscarException ("Projeto não encontrado");
+			throw new InvalidContentException ("Projeto não encontrado");
 		
         return projetoRepository.findById(id).map(DadosDetalhamentoProjeto::new);
 	}
@@ -86,7 +86,7 @@ public class ProjetoService {
 	public DadosDetalhamentoProjeto atualizar(@Valid DadosAtualizarProjeto dados) {
 		Optional<Projeto> validarProjeto = projetoRepository.findById(dados.id());
 		if (validarProjeto.isEmpty()) 
-			throw new BuscarException ("Projeto não encontrado");
+			throw new InvalidContentException ("Projeto não encontrado");
 		
 		Projeto projeto = projetoRepository.getReferenceById(dados.id());
 				projeto.setNome(dados.nome());

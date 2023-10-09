@@ -7,12 +7,12 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import br.com.magnasistemas.construcaocivil.exception.BuscarException;
+import br.com.magnasistemas.construcaocivil.exception.InvalidContentException;
 
 @RestControllerAdvice
-public class TratarErrosBuscaException {
-    @ExceptionHandler(BuscarException.class) 
-    public ResponseEntity<List<DadosErroBusca>> tratarBuscar(BuscarException ex) {
+public class InvalidContentHandler {
+    @ExceptionHandler(InvalidContentException.class) 
+    public ResponseEntity<List<DadosErroBusca>> tratarBuscar(InvalidContentException ex) {
         DadosErroBusca dadosErroBusca = new DadosErroBusca(ex.getMessage());
         return ResponseEntity.badRequest().body(List.of(dadosErroBusca));
     }

@@ -187,8 +187,6 @@ class EquipeControllerTest {
 	@Test
 	@DisplayName("Deve retornar um erro quando atualizar com um id inválido")
 	void atualizarEquipeInvalida() {
-		DadosAtualizarEquipe dadosAtualizarEquipe = new DadosAtualizarEquipe(1L, 1L, "Equipe", Turno.MATUTINO);
-
 		ResponseEntity<JsonNode> response = restTemplate.getForEntity("/equipe/atualizar", JsonNode.class);
 
 		assertTrue(response.getStatusCode().is4xxClientError());

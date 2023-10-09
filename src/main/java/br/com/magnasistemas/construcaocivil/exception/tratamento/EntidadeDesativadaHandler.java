@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import br.com.magnasistemas.construcaocivil.exception.EntidadeDesativadaException;
 
 @RestControllerAdvice
-public class TratarErrosEntidadeDesativada {
+public class EntidadeDesativadaHandler {
     @ExceptionHandler(EntidadeDesativadaException.class) 
     public ResponseEntity<List<DadosEntidadeDesativada>> tratarEntidadeDesativada(EntidadeDesativadaException ex) {
     	DadosEntidadeDesativada dadosEntidadeDesativada = new DadosEntidadeDesativada(ex.getMessage());

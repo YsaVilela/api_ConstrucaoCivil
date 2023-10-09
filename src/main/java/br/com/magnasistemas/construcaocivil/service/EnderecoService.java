@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import br.com.magnasistemas.construcaocivil.dto.projeto.DadosDetalhamentoEndereco;
 import br.com.magnasistemas.construcaocivil.entity.Endereco;
-import br.com.magnasistemas.construcaocivil.exception.BuscarException;
+import br.com.magnasistemas.construcaocivil.exception.InvalidContentException;
 import br.com.magnasistemas.construcaocivil.repository.EnderecoRepository;
 
 @Service
@@ -25,14 +25,14 @@ public class EnderecoService {
 	public Optional<DadosDetalhamentoEndereco> buscarPorId(Long id) {
 		Optional<Endereco> validarEndereco = enderecoRepository.findById(id);
 		if (validarEndereco.isEmpty()) 
-			throw new BuscarException ("Endereco não encontrado");
+			throw new InvalidContentException ("Endereco não encontrado");
         return enderecoRepository.findById(id).map(DadosDetalhamentoEndereco::new); 
 	}
 
 	public Optional<DadosDetalhamentoEndereco> buscarPorIdProjeto(Long id) {
 		Optional<Endereco> validarEndereco = enderecoRepository.findByIdProjeto(id); 
 		if (validarEndereco.isEmpty()) 
-			throw new BuscarException ("Endereco não encontrado");
+			throw new InvalidContentException ("Endereco não encontrado");
         return enderecoRepository.findByIdProjeto(id).map(DadosDetalhamentoEndereco::new); 
 	}
 }

@@ -1,10 +1,10 @@
 package br.com.magnasistemas.construcaocivil.exception;
 
-public class DadosInvalidosException extends RuntimeException {
+public class InvalidDataException extends RuntimeException {
 	
 	private static final long serialVersionUID = 1L;
 	
-	public DadosInvalidosException(String mensage) {
+	public InvalidDataException(String mensage) {
         super(mensage);
     }
 

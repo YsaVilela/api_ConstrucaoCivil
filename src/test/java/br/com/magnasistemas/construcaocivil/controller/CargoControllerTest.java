@@ -72,7 +72,7 @@ class CargoControllerTest {
 
 	private static Stream<Object[]> provideInvalidCargoData() {
 		return Stream.of(new Object[] { null, 1600.00 }, new Object[] { " ", 1600.00 }, new Object[] { "Cargo", null });
-	}
+	} 
 
 	@Test
 	@DisplayName("Deve retornar erro quando criar dois cargos com o mesmo nome")
@@ -86,7 +86,7 @@ class CargoControllerTest {
 	}
 
 	@Test
-	@DisplayName("Deve devolver codigo http 400 quando criar um cargo com o slario abaixo do minimo")
+	@DisplayName("Deve devolver codigo http 400 quando criar um cargo com o salario abaixo do minimo")
 	void criarRemuneracaoInvalida() {
 		DadosCargo dadosCargo = new DadosCargo("Cargo Teste", 150.00);
 

@@ -12,7 +12,7 @@ import br.com.magnasistemas.construcaocivil.dto.profissional.DadosAtualizarProfi
 import br.com.magnasistemas.construcaocivil.dto.profissional.DadosDetalhamentoProfissional;
 import br.com.magnasistemas.construcaocivil.dto.profissional.DadosProfissional;
 import br.com.magnasistemas.construcaocivil.entity.Profissional;
-import br.com.magnasistemas.construcaocivil.exception.BuscarException;
+import br.com.magnasistemas.construcaocivil.exception.InvalidContentException;
 import br.com.magnasistemas.construcaocivil.exception.CustomDataIntegrityException;
 import br.com.magnasistemas.construcaocivil.repository.CargoRepository;
 import br.com.magnasistemas.construcaocivil.repository.ConstrutoraRepository;
@@ -104,7 +104,7 @@ public class ProfissionalService {
 	public DadosDetalhamentoProfissional ativar(Long id) {
 		Optional<Profissional> validarProfissional = profissionalRepository.findById(id);
 		if (validarProfissional.isEmpty())
-			throw new BuscarException("Profissional não encontrado");
+			throw new InvalidContentException("Profissional não encontrado");
 
 		Profissional profissional = profissionalRepository.getReferenceById(id);
 		profissional.setStatus(true);

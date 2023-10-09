@@ -1,10 +1,10 @@
 package br.com.magnasistemas.construcaocivil.exception;
 
-public class BuscarException extends RuntimeException {
+public class InvalidContentException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 	
-	public BuscarException(String mensage) {
+	public InvalidContentException(String mensage) {
         super(mensage);
     }
  

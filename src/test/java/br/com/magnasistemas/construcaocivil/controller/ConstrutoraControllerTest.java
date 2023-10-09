@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import br.com.magnasistemas.construcaocivil.dto.construtora.DadosAtualizarConstrutora;
 import br.com.magnasistemas.construcaocivil.dto.construtora.DadosConstrutora;
 import br.com.magnasistemas.construcaocivil.dto.construtora.DadosDetalhamentoConstrutora;
+import br.com.magnasistemas.construcaocivil.exception.tratamento.CustomExceptionHandler;
 import br.com.magnasistemas.construcaocivil.repository.ConstrutoraRepository;
 
 @RunWith(SpringRunner.class)
@@ -66,10 +67,10 @@ class ConstrutoraControllerTest {
 		iniciarConstrutora();
 		DadosConstrutora dadosConstrutora = new DadosConstrutora("12345678901234", "Construtora Teste", "11912345678",
 				"teste@hotmail.com");
-		ResponseEntity<JsonNode> response = restTemplate.postForEntity("/construtora/cadastrar", dadosConstrutora,
-				JsonNode.class);
+		ResponseEntity<	CustomExceptionHandler.ErroUnicidade[]> response = restTemplate.postForEntity("/construtora/cadastrar",
+				dadosConstrutora, 	CustomExceptionHandler.ErroUnicidade[].class);
 
-		assertTrue(response.getStatusCode().is4xxClientError());
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
 	}
 
 	@Test
@@ -81,7 +82,7 @@ class ConstrutoraControllerTest {
 		ResponseEntity<JsonNode> response = restTemplate.postForEntity("/construtora/cadastrar", dadosConstrutora,
 				JsonNode.class);
 
-		assertTrue(response.getStatusCode().is4xxClientError());
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
 	}
 
 	@Test
@@ -135,7 +136,7 @@ class ConstrutoraControllerTest {
 
 		ResponseEntity<JsonNode> response = restTemplate.getForEntity("/construtora/buscar/1", JsonNode.class);
 
-		assertTrue(response.getStatusCode().is4xxClientError());
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
 	}
 
 	@Test
@@ -180,9 +181,6 @@ class ConstrutoraControllerTest {
 	@Test
 	@DisplayName("deve devolver um erro quando atualizar com um id inválido")
 	void atualizarConstrutoraInvalido() {
-
-		DadosAtualizarConstrutora dadosAtualizarConstrutora = new DadosAtualizarConstrutora(1L, "12345678901234",
-				"Construtora atualizada", "11987654321", "testaAtualiza@gmail.com");
 
 		ResponseEntity<JsonNode> response = restTemplate.getForEntity("/construtora/atualizar/1", JsonNode.class);
 

@@ -12,7 +12,7 @@ import br.com.magnasistemas.construcaocivil.dto.equipe.DadosAtualizarEquipe;
 import br.com.magnasistemas.construcaocivil.dto.equipe.DadosDetalhamentoEquipe;
 import br.com.magnasistemas.construcaocivil.dto.equipe.DadosEquipe;
 import br.com.magnasistemas.construcaocivil.entity.Equipe;
-import br.com.magnasistemas.construcaocivil.exception.BuscarException;
+import br.com.magnasistemas.construcaocivil.exception.InvalidContentException;
 import br.com.magnasistemas.construcaocivil.repository.ConstrutoraRepository;
 import br.com.magnasistemas.construcaocivil.repository.EquipeRepository;
 import br.com.magnasistemas.construcaocivil.repository.ProfissionalEquipeRepository;
@@ -83,7 +83,7 @@ public class EquipeService {
 	public DadosDetalhamentoEquipe ativar(Long id) {
 		Optional<Equipe> validarEquipe = equipeRepository.findById(id);
 		if (validarEquipe.isEmpty())
-			throw new BuscarException("Equipe não encontrado");
+			throw new InvalidContentException("Equipe não encontrado");
 
 		Equipe equipe = equipeRepository.getReferenceById(id);
 		equipe.setStatus(true);

@@ -12,7 +12,7 @@ import br.com.magnasistemas.construcaocivil.dto.construtora.DadosAtualizarConstr
 import br.com.magnasistemas.construcaocivil.dto.construtora.DadosConstrutora;
 import br.com.magnasistemas.construcaocivil.dto.construtora.DadosDetalhamentoConstrutora;
 import br.com.magnasistemas.construcaocivil.entity.Construtora;
-import br.com.magnasistemas.construcaocivil.exception.BuscarException;
+import br.com.magnasistemas.construcaocivil.exception.InvalidContentException;
 import br.com.magnasistemas.construcaocivil.exception.CustomDataIntegrityException;
 import br.com.magnasistemas.construcaocivil.repository.ConstrutoraRepository;
 import br.com.magnasistemas.construcaocivil.service.validacoes.construtora.ValidadorConstrutora;
@@ -38,11 +38,11 @@ public class ConstrutoraService {
 
 	void validacao(String cnpj, String telefone, String email) {
 		if (construtoraRepository.findByCpf(cnpj) != null)
-			throw new CustomDataIntegrityException("Duplicação de valor da chave cpf viola a restrição de unicidade.");
+			throw new CustomDataIntegrityException("Duplicação de valor da chave cnpj viola a restrição de unicidade.");
 		if (construtoraRepository.findByTelefone(telefone)!= null)
 			throw new CustomDataIntegrityException("Duplicação de valor da chave telefone viola a restrição de unicidade.");
 		if (construtoraRepository.findByEmail(email)!= null)
-			throw new CustomDataIntegrityException("Duplicação de valor da chave telefone viola a restrição de unicidade.");
+			throw new CustomDataIntegrityException("Duplicação de valor da chave email viola a restrição de unicidade.");
 	}
 	
 	public Optional<DadosDetalhamentoConstrutora> criarConstrutora(DadosConstrutora dados) {
@@ -98,7 +98,7 @@ public class ConstrutoraService {
 	public DadosDetalhamentoConstrutora ativar(Long id) {
 		Optional<Construtora> validarConstrutora = construtoraRepository.findById(id);
 		if (validarConstrutora.isEmpty()) 
-			throw new BuscarException ("Construtora não encontrada");
+			throw new InvalidContentException ("Construtora não encontrada");
 		
 		Construtora construtora = construtoraRepository.getReferenceById(id);
 			construtora.setStatus(true);
