@@ -1,0 +1,256 @@
+{
+	"info": {
+		"_postman_id": "f03084e9-3fb0-48e4-821d-f9c85de6d0d7",
+		"name": "Profissional",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29072219"
+	},
+	"item": [
+		{
+			"name": "Cadastrar Profissional",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"idConstrutora\":1,\r\n    \"cpf\":43971045308,\r\n    \"nome\":\"Tamirys Martins\",\r\n    \"telefone\":\"40476372038\",\r\n    \"idCargo\":2\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/profissional/cadastrar",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"profissional",
+						"cadastrar"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Buscar Profissional",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"idConstrutora\":1,\r\n    \"cpf\":56521610864,\r\n    \"nome\":\"Guilherme\",\r\n    \"telefone\":\"11977215009\",\r\n    \"idCargo\":2\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/profissional/buscar/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"profissional",
+						"buscar",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Listar Profissional Ativos",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"idConstrutora\":1,\r\n    \"cpf\":56521610864,\r\n    \"nome\":\"Guilherme\",\r\n    \"telefone\":\"11977215009\",\r\n    \"idCargo\":2\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/profissional/listar",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"profissional",
+						"listar"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Listar Todos Profissionais",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"idConstrutora\":1,\r\n    \"cpf\":56521610864,\r\n    \"nome\":\"Guilherme\",\r\n    \"telefone\":\"11977215009\",\r\n    \"idCargo\":2\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/profissional/listar/todos",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"profissional",
+						"listar",
+						"todos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Atualizar Profissional",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\":1,\r\n    \"idConstrutora\":6,\r\n    \"cpf\":12345678900,\r\n    \"nome\":\"Ysadora\",\r\n    \"telefone\":\"11977210000\",\r\n    \"idCargo\":3\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/profissional/atualizar",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"profissional",
+						"atualizar"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Desativar Profissional Copy",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\":1,\r\n    \"idConstrutora\":1,\r\n    \"cpf\":12345678900,\r\n    \"nome\":\"Ysadora\",\r\n    \"telefone\":\"11977210000\",\r\n    \"idCargo\":1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/profissional/ativar/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"profissional",
+						"ativar",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Desativar Profissional",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\":1,\r\n    \"idConstrutora\":1,\r\n    \"cpf\":12345678900,\r\n    \"nome\":\"Ysadora\",\r\n    \"telefone\":\"11977210000\",\r\n    \"idCargo\":1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/profissional/desativar/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"profissional",
+						"desativar",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deletar Profissional",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\":1,\r\n    \"idConstrutora\":1,\r\n    \"cpf\":12345678900,\r\n    \"nome\":\"Ysadora\",\r\n    \"telefone\":\"11977210000\",\r\n    \"idCargo\":1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/profissional/deletar/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"profissional",
+						"deletar",
+						"2"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
